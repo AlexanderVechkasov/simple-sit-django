@@ -1,7 +1,8 @@
 """Модели исторической шкалы: события и их изображения."""
-
 from django.db import models
+from django.utils.html import strip_tags
 
+from .sanitize import clean_html
 
 class Event(models.Model):
     """Историческое событие на шкале."""
@@ -74,6 +75,13 @@ class Event(models.Model):
         if self.end_year and self.end_year != self.start_year:
             return f"{self.start_year}—{self.end_year}"
         return str(self.start_year)
+
+    def save(self, *args, **kwargs):
+            # Очищаем текст при КАЖДОМ сохранении: из админки, импорта или кода.
+            self.body = clean_html(self.body)
+            # Краткая справка — обычный текст, поэтому теги убираем полностью.
+            self.summary = strip_tags(self.summary).strip()
+            super().save(*args, **kwargs)
 
 
 class EventImage(models.Model):
