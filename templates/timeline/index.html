@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="main-content">
+    <div class="timeline">
+        {% for event in events %}
+            <div class="event" data-year="{{ event.key }}">
+                <div class="dot"></div>
+                <div class="year">{{ event.years_display }} — {{ event.title }}</div>
+                <div class="event-description" id="event-{{ event.key }}">
+                    {% for image in event.images.all %}
+                        <img src="{{ image.image.url }}" alt="{{ image.caption }}"
+                             class="event-image" data-index="{{ forloop.counter0 }}"
+                             loading="lazy">
+                    {% endfor %}
+                    <p><strong>{{ event.title }} ({{ event.years_display }}):</strong> {{ event.summary }}</p>
+                </div>
+            </div>
+        {% empty %}
+            <p>Событий пока нет. Добавьте их в админке или запустите импорт.</p>
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}
