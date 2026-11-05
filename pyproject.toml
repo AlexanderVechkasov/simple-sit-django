@@ -7,4 +7,5 @@ dependencies = [
     "django-environ>=0.14.0",
     "nh3>=0.3.7",
     "pillow>=13.0.0",
+    "whitenoise>=6.12.0",
 ]

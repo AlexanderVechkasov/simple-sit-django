@@ -33,12 +33,15 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    # Чтобы runserver отдавал статику так же, как сервер (через WhiteNoise).
+    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "timeline",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -89,8 +92,11 @@ TIME_ZONE = "Europe/Moscow"
 USE_I18N = True
 USE_TZ = True
 
-# Статика (CSS, JS, иконки). WhiteNoise подключим на этапе 4.
+# Статика (CSS, JS, иконки).
 STATIC_URL = "static/"
+# Где лежат наши исходные файлы статики.
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Загруженные файлы — картинки событий.
 MEDIA_URL = "media/"
