@@ -1,5 +1,6 @@
 """Модели исторической шкалы: события и их изображения."""
 from django.db import models
+from django.urls import reverse
 from django.utils.html import strip_tags
 
 from .sanitize import clean_html
@@ -68,6 +69,10 @@ class Event(models.Model):
 
     def __str__(self):
         return f"{self.years_display} — {self.title}"
+
+    def get_absolute_url(self):
+        """Адрес страницы события: /events/<slug>/."""
+        return reverse("timeline:event_detail", kwargs={"slug": self.slug})
 
     @property
     def years_display(self):

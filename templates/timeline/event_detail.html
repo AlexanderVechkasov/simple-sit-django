@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ event.title }} ({{ event.years_display }}) — Историческая шкала России{% endblock %}
+{% block description %}{{ event.summary|truncatechars:160 }}{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/article.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="article-main">
+    <div class="container">
+        <article>
+            <h1 class="article-title" id="articleTitle">{{ event.title }}</h1>
+            <p class="article-meta" id="articleMeta">
+                Годы: {{ event.years_display }}
+                {% if event.region %} | Регион: {{ event.region }}{% endif %}
+                {% if event.outcome %} | Результат: {{ event.get_outcome_display }}{% endif %}
+            </p>
+
+            {% for image in event.images.all %}
+                <figure>
+                    <img src="{{ image.image.url }}" alt="{{ image.caption }}"
+                         class="article-image-main"{% if forloop.first %} id="mainArticleImage"{% endif %}>
+                    <figcaption class="image-caption"{% if forloop.first %} id="mainImageCaption"{% endif %}>
+                        {{ image.caption }}{% if image.source %} · Источник: {{ image.source }}{% endif %}
+                    </figcaption>
+                </figure>
+            {% endfor %}
+
+            <div class="article-content" id="articleContent">
+                {# |safe можно только потому, что body очищен через nh3 при сохранении #}
+                {{ event.body|safe }}
+            </div>
+
+            <div class="article-footer">
+                <a href="{% url 'timeline:index' %}#event-{{ event.key }}" class="back-link">&larr; Вернуться на шкалу</a>
+            </div>
+        </article>
+    </div>
+</main>
+{% endblock %}

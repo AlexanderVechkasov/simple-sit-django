@@ -4,16 +4,17 @@
 <main class="main-content">
     <div class="timeline">
         {% for event in events %}
-            <div class="event" data-year="{{ event.key }}">
+            <div class="event" id="event-{{ event.key }}" data-year="{{ event.key }}">
                 <div class="dot"></div>
                 <div class="year">{{ event.years_display }} — {{ event.title }}</div>
-                <div class="event-description" id="event-{{ event.key }}">
+                <div class="event-description" id="description-{{ event.key }}" hidden>
                     {% for image in event.images.all %}
                         <img src="{{ image.image.url }}" alt="{{ image.caption }}"
                              class="event-image" data-index="{{ forloop.counter0 }}"
                              loading="lazy">
                     {% endfor %}
                     <p><strong>{{ event.title }} ({{ event.years_display }}):</strong> {{ event.summary }}</p>
+                    <a href="{{ event.get_absolute_url }}" class="read-article-btn">Читать статью</a>
                 </div>
             </div>
         {% empty %}
