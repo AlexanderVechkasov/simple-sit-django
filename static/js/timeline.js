@@ -64,12 +64,12 @@ function setupTimeline() {
 
     // Пришли по ссылке «Вернуться на шкалу» (/#event-1914a) — раскрываем это событие.
     const target = document.getElementById(window.location.hash.slice(1));
-    if (target && target.classList.contains('event')) {
+        if (target && target.classList.contains('event')) {
         expandCard(target);
         target.querySelector('.year').focus();
+        history.replaceState(null, '', window.location.pathname + window.location.search);
     }
 }
-
 
 /* ===== Галерея ===== */
 
