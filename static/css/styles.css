@@ -596,3 +596,77 @@ body {
         outline-offset: 2px;
     }
 }
+
+/* ========================================= */
+/* Дополнения для Django-версии              */
+/* ========================================= */
+
+/* Атрибут hidden всегда скрывает элемент, даже если в CSS задан display. */
+[hidden] {
+    display: none !important;
+}
+
+/* Заголовок события теперь кнопка: убираем стандартный вид кнопки,
+   остальное оформление берётся из правила .year выше. */
+button.year {
+    font-family: inherit;
+    line-height: inherit;
+    border: none;
+    text-align: inherit;
+    cursor: pointer;
+}
+
+button.year:focus-visible,
+.gallery-link:focus-visible {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* При переходе по ссылке #event-… карточка не прячется под фиксированной шапкой. */
+.event {
+    scroll-margin-top: 100px;
+}
+
+/* Картинка-ссылка, открывающая галерею. */
+.gallery-link {
+    display: block;
+    border-radius: 5px;
+}
+
+/* Галерея на встроенном элементе <dialog>. */
+.gallery-dialog {
+    margin: auto; /* центрируем: правило * { margin: 0 } выше это сбивает */
+    border: none;
+    border-radius: 10px;
+    padding: 0;
+    max-width: 90vw;
+    max-height: 90vh;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.gallery-dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.gallery-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 45px 20px 20px;
+}
+
+#imageGalleryModal.gallery-dialog #galleryImage {
+    max-height: 70vh;
+}
+
+/* Кто попросил систему уменьшить движение — убираем анимации. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

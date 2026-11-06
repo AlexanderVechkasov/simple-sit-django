@@ -21,8 +21,11 @@
 
             {% for image in event.images.all %}
                 <figure>
-                    <img src="{{ image.image.url }}" alt="{{ image.caption }}"
-                         class="article-image-main"{% if forloop.first %} id="mainArticleImage"{% endif %}>
+                    <a href="{{ image.image.url }}" class="gallery-link"
+                       data-gallery="article" data-caption="{{ image.caption }}">
+                        <img src="{{ image.image.url }}" alt="{{ image.caption }}"
+                             class="article-image-main"{% if forloop.first %} id="mainArticleImage"{% endif %}>
+                    </a>
                     <figcaption class="image-caption"{% if forloop.first %} id="mainImageCaption"{% endif %}>
                         {{ image.caption }}{% if image.source %} · Источник: {{ image.source }}{% endif %}
                     </figcaption>

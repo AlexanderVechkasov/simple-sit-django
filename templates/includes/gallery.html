@@ -1,0 +1,12 @@
+{# Окно галереи. Открывается из static/js/timeline.js. #}
+<dialog id="imageGalleryModal" class="gallery-dialog" aria-label="Просмотр изображения">
+    <div class="gallery-inner">
+        <button type="button" class="close-btn" aria-label="Закрыть галерею"></button>
+        <div class="gallery-content">
+            <button type="button" class="gallery-nav gallery-prev" aria-label="Предыдущее изображение">&#10094;</button>
+            <img id="galleryImage" alt="">
+            <button type="button" class="gallery-nav gallery-next" aria-label="Следующее изображение">&#10095;</button>
+        </div>
+        <p class="gallery-caption" aria-live="polite"></p>
+    </div>
+</dialog>

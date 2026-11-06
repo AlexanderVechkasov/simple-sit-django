@@ -7,6 +7,7 @@
     <meta name="description" content="{% block description %}Интерактивная хронология военных конфликтов Российской империи 1722–1918 годов{% endblock %}">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     {% block extra_head %}{% endblock %}
+    <script src="{% static 'js/timeline.js' %}" defer></script>
 </head>
 <body>
     {% include "includes/header.html" %}
@@ -14,6 +15,8 @@
     {% block content %}{% endblock %}
 
     {% include "includes/footer.html" %}
+
+    {% include "includes/gallery.html" %}
 
     {% block extra_js %}{% endblock %}
 </body>

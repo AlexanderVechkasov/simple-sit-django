@@ -1,17 +1,21 @@
 {% extends "base.html" %}
-
 {% block content %}
 <main class="main-content">
     <div class="timeline">
         {% for event in events %}
             <div class="event" id="event-{{ event.key }}" data-year="{{ event.key }}">
                 <div class="dot"></div>
-                <div class="year">{{ event.years_display }} — {{ event.title }}</div>
+                <button type="button" class="year"
+                        aria-expanded="false" aria-controls="description-{{ event.key }}">
+                    {{ event.years_display }} — {{ event.title }}
+                </button>
                 <div class="event-description" id="description-{{ event.key }}" hidden>
                     {% for image in event.images.all %}
-                        <img src="{{ image.image.url }}" alt="{{ image.caption }}"
-                             class="event-image" data-index="{{ forloop.counter0 }}"
-                             loading="lazy">
+                        <a href="{{ image.image.url }}" class="gallery-link"
+                           data-gallery="{{ event.key }}" data-caption="{{ image.caption }}">
+                            <img src="{{ image.image.url }}" alt="{{ image.caption }}"
+                                 class="event-image" loading="lazy">
+                        </a>
                     {% endfor %}
                     <p><strong>{{ event.title }} ({{ event.years_display }}):</strong> {{ event.summary }}</p>
                     <a href="{{ event.get_absolute_url }}" class="read-article-btn">Читать статью</a>
