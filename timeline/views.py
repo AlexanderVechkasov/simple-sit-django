@@ -40,7 +40,20 @@ def timeline(request):
 def event_detail(request, slug):
     """Страница-статья одного события: /events/1914-pervaya-mirovaya-voyna/."""
     event = get_object_or_404(Event.objects.prefetch_related("images"), slug=slug)
-    return render(request, "timeline/event_detail.html", {"event": event})
+
+    # Соседние события на шкале — для ссылок «Предыдущее» и «Следующее».
+    # Берём только нужные поля: адрес, заголовок и годы.
+    all_events = list(Event.objects.only("slug", "title", "start_year", "end_year"))
+    position = next(i for i, item in enumerate(all_events) if item.pk == event.pk)
+    previous_event = all_events[position - 1] if position > 0 else None
+    next_event = all_events[position + 1] if position + 1 < len(all_events) else None
+
+    context = {
+        "event": event,
+        "previous_event": previous_event,
+        "next_event": next_event,
+    }
+    return render(request, "timeline/event_detail.html", context)
 
 
 def event_by_year(request, year):

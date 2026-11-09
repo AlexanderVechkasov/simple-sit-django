@@ -3,23 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
     <title>Ошибка на сервере — Историческая шкала России</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/article.css' %}">
+    <link rel="stylesheet" href="{% static 'css/site.css' %}">
 </head>
 <body>
-    {# Эта страница специально НЕ наследует base.html: если ошибка #}
-    {# в общем шаблоне, страница ошибки тоже не должна сломаться.  #}
-    <main class="article-main">
-        <div class="container">
-            <article>
-                <h1 class="article-title" id="articleTitle">Что-то пошло не так</h1>
-                <p>На сервере произошла ошибка. Попробуйте обновить страницу чуть позже.</p>
-                <div class="article-footer">
-                    <a href="/" class="back-link">&larr; На главную шкалу</a>
-                </div>
-            </article>
+    {# Эта страница специально НЕ наследует base.html: если ошибка   #}
+    {# в общем шаблоне, страница ошибки тоже не должна сломаться.    #}
+    {# Тема здесь только системная: theme.js не подключаем ради простоты. #}
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="site-logo" href="/">Историческая шкала России</a>
         </div>
+    </header>
+
+    <main id="main" class="article-page error-page">
+        <p class="article-years">Ошибка 500</p>
+        <h1 class="article-title">Что-то пошло не так</h1>
+        <p class="lead">На сервере произошла ошибка. Попробуйте обновить страницу чуть позже.</p>
+        <p>
+            <a class="read-more" href="/">На главную шкалу <span aria-hidden="true">→</span></a>
+        </p>
     </main>
 </body>
 </html>

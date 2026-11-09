@@ -1,23 +1,17 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block title %}Страница не найдена — Историческая шкала России{% endblock %}
 
-{% block extra_head %}
-    <link rel="stylesheet" href="{% static 'css/article.css' %}">
-{% endblock %}
-
 {% block content %}
-<main class="article-main" id="main">
-    <div class="container">
-        <article>
-            <h1 class="article-title" id="articleTitle">Страница не найдена</h1>
-            <p>Возможно, в адресе опечатка или такой статьи на сайте нет.
-               Все события собраны на главной шкале.</p>
-            <div class="article-footer">
-                <a href="{% url 'timeline:index' %}" class="back-link">&larr; На главную шкалу</a>
-            </div>
-        </article>
-    </div>
+<main id="main" class="article-page error-page">
+    <p class="article-years">Ошибка 404</p>
+    <h1 class="article-title">Страница не найдена</h1>
+    <p class="lead">Возможно, в адресе опечатка или такой статьи на сайте нет.
+        Все события собраны на главной шкале.</p>
+    <p>
+        <a class="read-more" href="{% url 'timeline:index' %}">
+            На главную шкалу <span aria-hidden="true">→</span>
+        </a>
+    </p>
 </main>
 {% endblock %}

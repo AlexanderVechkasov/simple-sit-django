@@ -1,46 +1,72 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block title %}{{ event.title }} ({{ event.years_display }}) — Историческая шкала России{% endblock %}
 {% block description %}{{ event.summary|truncatechars:160 }}{% endblock %}
 
-{% block extra_head %}
-    <link rel="stylesheet" href="{% static 'css/article.css' %}">
-{% endblock %}
-
 {% block content %}
-<main class="article-main" id="main">
-    <div class="container">
-        <article>
-            <h1 class="article-title" id="articleTitle">{{ event.title }}</h1>
-            <p class="article-meta" id="articleMeta">
-                Годы: {{ event.years_display }}
-                {% if event.region %} | Регион: {{ event.region }}{% endif %}
-                {% if event.outcome %} | Результат: {{ event.get_outcome_display }}{% endif %}
-            </p>
+<main id="main" class="article-page">
+    <p class="article-back">
+        <a class="back-link" href="{% url 'timeline:index' %}#event-{{ event.key }}">
+            <span aria-hidden="true">←</span> Вся шкала
+        </a>
+    </p>
 
-            {% for image in event.images.all %}
-                <figure>
-                    <a href="{{ image.image.url }}" class="gallery-link"
-                       data-gallery="article" data-caption="{{ image.caption }}">
-                        <img src="{{ image.image.url }}" alt="{{ image.caption }}"
-                             class="article-image-main"{% if forloop.first %} id="mainArticleImage"{% endif %}>
-                    </a>
-                    <figcaption class="image-caption"{% if forloop.first %} id="mainImageCaption"{% endif %}>
-                        {{ image.caption }}{% if image.source %} · Источник: {{ image.source }}{% endif %}
-                    </figcaption>
-                </figure>
-            {% endfor %}
+    <article class="article">
+        <header class="article-header">
+            <p class="article-years">{{ event.years_display }}</p>
+            <h1 class="article-title">{{ event.title }}</h1>
 
-            <div class="article-content" id="articleContent">
-                {# |safe можно только потому, что body очищен через nh3 при сохранении #}
-                {{ event.body|safe }}
-            </div>
+            {% if event.region or event.outcome %}
+                <dl class="article-facts">
+                    {% if event.region %}
+                        <div>
+                            <dt>Регион</dt>
+                            <dd>{{ event.region }}</dd>
+                        </div>
+                    {% endif %}
+                    {% if event.outcome %}
+                        <div>
+                            <dt>Итог</dt>
+                            <dd><span class="outcome outcome--{{ event.outcome }}">{{ event.get_outcome_display }}</span></dd>
+                        </div>
+                    {% endif %}
+                </dl>
+            {% endif %}
+        </header>
 
-            <div class="article-footer">
-                <a href="{% url 'timeline:index' %}#event-{{ event.key }}" class="back-link">&larr; Вернуться на шкалу</a>
-            </div>
-        </article>
-    </div>
+        {% for image in event.images.all %}
+            <figure class="article-figure">
+                <a href="{{ image.image.url }}" class="gallery-link"
+                   data-gallery="article" data-caption="{{ image.caption }}">
+                    <img src="{{ image.image.url }}" alt="{{ image.caption }}">
+                </a>
+                <figcaption>
+                    {{ image.caption }}{% if image.source %} · Источник: {{ image.source }}{% endif %}
+                </figcaption>
+            </figure>
+        {% endfor %}
+
+        <div class="article-body">
+            {# |safe можно только потому, что body очищен через nh3 при сохранении #}
+            {{ event.body|safe }}
+        </div>
+    </article>
+
+    {% if previous_event or next_event %}
+        <nav class="article-nav" aria-label="Соседние события">
+            {% if previous_event %}
+                <a class="article-nav-link" href="{{ previous_event.get_absolute_url }}">
+                    <span class="article-nav-label"><span aria-hidden="true">←</span> Предыдущее</span>
+                    <span class="article-nav-title">{{ previous_event.years_display }} · {{ previous_event.title }}</span>
+                </a>
+            {% endif %}
+            {% if next_event %}
+                <a class="article-nav-link article-nav-next" href="{{ next_event.get_absolute_url }}">
+                    <span class="article-nav-label">Следующее <span aria-hidden="true">→</span></span>
+                    <span class="article-nav-title">{{ next_event.years_display }} · {{ next_event.title }}</span>
+                </a>
+            {% endif %}
+        </nav>
+    {% endif %}
 </main>
 {% endblock %}
