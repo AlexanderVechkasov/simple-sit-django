@@ -11,8 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupGallery();
 });
 
-
-/* ===== Карточки на шкале ===== */
+/* =====  Карточки на шкале ===== */
 
 function setupTimeline() {
     const timeline = document.querySelector('.timeline');
@@ -20,53 +19,40 @@ function setupTimeline() {
 
     let openCard = null; // какая карточка сейчас раскрыта
 
-    function getParts(card) {
-        const button = card.querySelector('.year');
-        const description = document.getElementById(button.getAttribute('aria-controls'));
-        return { button, description };
-    }
-
-    function collapseCard(card) {
-        const { button, description } = getParts(card);
-        card.classList.remove('active');
-        button.setAttribute('aria-expanded', 'false');
-        description.hidden = true;
-        openCard = null;
-    }
-
-    function expandCard(card) {
-        if (openCard) collapseCard(openCard);
-        const { button, description } = getParts(card);
-        description.hidden = false;
-        // Заставляем браузер «увидеть» показанный блок до добавления класса,
-        // иначе плавное раскрытие из CSS не сработает.
-        void description.offsetHeight;
-        card.classList.add('active');
-        button.setAttribute('aria-expanded', 'true');
-        openCard = card;
+    // Раскрыть (open = true) или свернуть (open = false) одну карточку.
+    function setOpen(card, open) {
+        const button = card.querySelector('.event-toggle');
+        const body = document.getElementById(button.getAttribute('aria-controls'));
+        button.setAttribute('aria-expanded', String(open));
+        body.hidden = !open;
+        card.classList.toggle('active', open);
     }
 
     function toggleCard(card) {
         if (card === openCard) {
-            collapseCard(card);
-        } else {
-            expandCard(card);
+            setOpen(card, false);
+            openCard = null;
+            return;
         }
+        if (openCard) setOpen(openCard, false); // одновременно открыта только одна
+        setOpen(card, true);
+        openCard = card;
     }
 
-    // Клик по любому месту карточки. Кнопка .year внутри карточки,
-    // поэтому Enter и Пробел на ней тоже приходят сюда как клик.
+    // Раскрывает и сворачивает только кнопка-заголовок: по тексту и
+    // картинкам внутри раскрытой карточки можно кликать спокойно.
     timeline.addEventListener('click', (event) => {
-        if (event.target.closest('a')) return; // ссылки и картинки работают сами
-        const card = event.target.closest('.event');
-        if (card) toggleCard(card);
+        const button = event.target.closest('.event-toggle');
+        if (button) toggleCard(button.closest('.event'));
     });
 
     // Пришли по ссылке «Вернуться на шкалу» (/#event-1914a) — раскрываем это событие.
     const target = document.getElementById(window.location.hash.slice(1));
-        if (target && target.classList.contains('event')) {
-        expandCard(target);
-        target.querySelector('.year').focus();
+    if (target && target.classList.contains('event')) {
+        toggleCard(target);
+        target.querySelector('.event-toggle').focus();
+        // Убираем #event-… из адреса: якорь нужен только один раз,
+        // иначе при обновлении страницы карточка раскроется снова.
         history.replaceState(null, '', window.location.pathname + window.location.search);
     }
 }

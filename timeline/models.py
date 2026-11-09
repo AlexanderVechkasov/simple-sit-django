@@ -70,6 +70,11 @@ class Event(models.Model):
     def __str__(self):
         return f"{self.years_display} — {self.title}"
 
+    @property
+    def century(self):
+        """Век по году начала: 1722 → 18, 1801 → 19, 1900 → 19."""
+        return (self.start_year - 1) // 100 + 1
+
     def get_absolute_url(self):
         """Адрес страницы события: /events/<slug>/."""
         return reverse("timeline:event_detail", kwargs={"slug": self.slug})

@@ -309,3 +309,334 @@ a:hover {
         scroll-behavior: auto !important;
     }
 }
+
+
+/* =====  Главная: вступление ===== */
+
+.intro {
+    width: min(100% - 2rem, var(--text-width));
+    margin: 4rem auto 2rem;
+}
+
+.intro h1 {
+    margin: 0 0 1rem;
+    font-size: clamp(2rem, 6vw, 3.25rem); /* от 32 до 52 px в зависимости от экрана */
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.lead {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 1.1875rem;
+}
+
+
+/* =====  Главная: навигация по векам ===== */
+
+/* Переход по якорю учитывает и шапку, и строку веков под ней */
+html:has(.century-nav) {
+    scroll-padding-top: calc(var(--header-height) + 4.5rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth; /* плавная прокрутка к векам */
+    }
+}
+
+.century-nav {
+    position: sticky; /* прилипает под шапкой */
+    top: var(--header-height);
+    z-index: 90;
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-bg);
+    background-color: color-mix(in srgb, var(--color-bg) 85%, transparent);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+}
+
+.century-nav ul {
+    display: flex;
+    gap: 0.5rem;
+    width: min(100% - 2rem, var(--text-width));
+    margin: 0 auto;
+    padding: 0.625rem 0;
+    overflow-x: auto; /* на узком экране — прокрутка вбок */
+    list-style: none;
+}
+
+.century-nav a {
+    display: inline-block;
+    padding: 0.375rem 0.875rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    color: var(--color-text);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color var(--transition);
+}
+
+.century-nav a:hover {
+    background-color: var(--color-accent-soft);
+}
+
+.century-nav a:focus-visible {
+    border-radius: 999px;
+}
+
+
+/* ===== Главная: шкала событий ===== */
+
+.timeline {
+    width: min(100% - 2rem, var(--text-width));
+    margin: 0 auto;
+}
+
+.century {
+    padding-top: 3rem;
+}
+
+.century-title {
+    margin: 0 0 1rem;
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    letter-spacing: -0.02em;
+}
+
+/* Список событий с вертикальной линией слева */
+.event-list {
+    position: relative;
+    margin: 0;
+    padding: 0 0 0 28px;
+    list-style: none;
+}
+
+.event-list::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    left: 7px;
+    width: 2px;
+    background-color: var(--color-border);
+}
+
+.event {
+    position: relative;
+    margin-bottom: 0.25rem;
+}
+
+/* Точка на линии */
+.event::before {
+    content: "";
+    position: absolute;
+    top: 21px;
+    left: -27px;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--color-accent);
+    border-radius: 50%;
+    background-color: var(--color-bg);
+    transition: background-color var(--transition);
+}
+
+.event.active::before {
+    background-color: var(--color-accent);
+}
+
+/* h3 нужен для структуры страницы, но выглядеть должен как кнопка */
+.event-heading {
+    margin: 0;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+/* Кнопка-заголовок события: годы | название | итог | стрелка */
+.event-toggle {
+    display: grid;
+    grid-template-columns: 8.5rem 1fr auto auto;
+    grid-template-areas: "years title outcome chevron";
+    align-items: center;
+    gap: 0.25rem 1rem;
+    width: 100%;
+    margin: 0;
+    padding: 0.875rem 1rem;
+    border: none;
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--color-text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: background-color var(--transition);
+}
+
+.event-toggle:hover,
+.event.active .event-toggle {
+    background-color: var(--color-surface);
+}
+
+.event.active .event-toggle {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.event-years {
+    grid-area: years;
+    color: var(--color-accent);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums; /* цифры одинаковой ширины — годы ровным столбиком */
+}
+
+.event-title {
+    grid-area: title;
+    font-weight: 600;
+}
+
+.chevron {
+    grid-area: chevron;
+    width: 20px;
+    height: 20px;
+    color: var(--color-muted);
+    transition: transform var(--transition);
+}
+
+.event.active .chevron {
+    transform: rotate(180deg);
+}
+
+/* Метка итога: цветная точка + слово (смысл не передаётся одним цветом) */
+.outcome {
+    grid-area: outcome;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.125rem 0.625rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    color: var(--color-muted);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.outcome::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--color-muted);
+}
+
+.outcome--victory::before {
+    background-color: #2f9e5f;
+}
+
+.outcome--defeat::before {
+    background-color: #d64545;
+}
+
+.outcome--draw::before {
+    background-color: #c98a1a;
+}
+
+/* Раскрытая часть карточки */
+.event-body {
+    padding: 0.25rem 1rem 1.25rem calc(8.5rem + 2rem); /* текст под названием */
+    border-radius: 0 0 var(--radius) var(--radius);
+    background-color: var(--color-surface);
+    animation: reveal 0.25s ease;
+}
+
+@keyframes reveal {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+}
+
+.event-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.event-images .gallery-link {
+    width: min(100%, 280px);
+}
+
+.event-images img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover; /* картинка заполняет рамку без искажений */
+    border-radius: 8px;
+}
+
+.gallery-link {
+    display: block;
+    border-radius: 8px;
+}
+
+.event-summary {
+    margin: 0 0 1rem;
+}
+
+/* Кнопка-ссылка «Читать статью» */
+.read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1.125rem;
+    border-radius: 999px;
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color var(--transition);
+}
+
+.read-more:hover {
+    background-color: var(--color-accent-hover);
+    color: var(--color-bg);
+}
+
+.read-more:focus-visible {
+    border-radius: 999px;
+}
+
+.empty-note {
+    color: var(--color-muted);
+}
+
+/* Телефон: годы и стрелка в первой строке, название и итог — ниже */
+@media (max-width: 600px) {
+    .site-logo {
+        font-size: 1rem; /* чтобы название сайта влезло в одну строку */
+    }
+
+    .event-toggle {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "years chevron"
+            "title title"
+            "outcome outcome";
+        padding: 0.75rem;
+    }
+
+    .outcome {
+        justify-self: start;
+    }
+
+    .event::before {
+        top: 17px;
+    }
+
+    .event-body {
+        padding: 0.25rem 0.75rem 1rem;
+    }
+}
