@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<main class="main-content">
+<main class="main-content" id="main">
     <div class="timeline">
         {% for event in events %}
             <div class="event" id="event-{{ event.key }}" data-year="{{ event.key }}">
