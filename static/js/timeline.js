@@ -118,9 +118,9 @@ function setupGallery() {
         if (event.key === 'ArrowRight') show(index + 1);
     });
 
-    // Клик по затемнённому фону (мимо содержимого) закрывает окно.
+    // Клик по тёмному фону — мимо картинки, кнопок и подписи — закрывает окно.
     dialog.addEventListener('click', (event) => {
-        if (event.target === dialog) dialog.close();
+        if (!event.target.closest('img, button, .gallery-caption')) dialog.close();
     });
 
     // При любом закрытии (крестик, Esc, фон) возвращаем фокус на картинку.

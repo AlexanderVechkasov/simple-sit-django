@@ -1,12 +1,29 @@
-{# Окно галереи. Открывается из static/js/timeline.js. #}
+{# Окно галереи на весь экран. Открывается из static/js/timeline.js. #}
 <dialog id="imageGalleryModal" class="gallery-dialog" aria-label="Просмотр изображения">
     <div class="gallery-inner">
-        <button type="button" class="close-btn" aria-label="Закрыть галерею"></button>
-        <div class="gallery-content">
-            <button type="button" class="gallery-nav gallery-prev" aria-label="Предыдущее изображение">&#10094;</button>
-            <img id="galleryImage" alt="">
-            <button type="button" class="gallery-nav gallery-next" aria-label="Следующее изображение">&#10095;</button>
-        </div>
+        <button type="button" class="gallery-button close-btn" aria-label="Закрыть галерею">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" aria-hidden="true" focusable="false">
+                <path d="M6 6l12 12M18 6 6 18"/>
+            </svg>
+        </button>
+
+        <button type="button" class="gallery-button gallery-prev" aria-label="Предыдущее изображение">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="m15 18-6-6 6-6"/>
+            </svg>
+        </button>
+
+        <img id="galleryImage" alt="">
+
+        <button type="button" class="gallery-button gallery-next" aria-label="Следующее изображение">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="m9 18 6-6-6-6"/>
+            </svg>
+        </button>
+
         <p class="gallery-caption" aria-live="polite"></p>
     </div>
 </dialog>
