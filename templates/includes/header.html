@@ -6,6 +6,14 @@
         <a class="site-logo" href="{% url 'timeline:index' %}">Историческая шкала России</a>
 
         <div class="header-actions">
+            <a class="header-link" href="{% url 'feedback:form' %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <rect x="3" y="5" width="18" height="14" rx="2"/>
+                    <path d="m3 7 9 6 9-6"/>
+                </svg>
+                <span class="header-link-text">Написать нам</span>
+            </a>
             <a class="icon-button" href="https://vk.com" target="_blank" rel="noopener noreferrer"
                aria-label="Мы во ВКонтакте (откроется в новой вкладке)">
                 <img src="{% static 'img/vk-icon.svg' %}" alt="" width="22" height="22">

@@ -10,6 +10,7 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     # Всё остальное — страницы исторической шкалы.
     path("", include("timeline.urls")),
+    path("", include("feedback.urls")),
 ]
 
 # При разработке Django сам отдаёт загруженные картинки из папки media/.

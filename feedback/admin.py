@@ -8,15 +8,15 @@ from .models import FeedbackMessage
 
 @admin.register(FeedbackMessage)
 class FeedbackMessageAdmin(admin.ModelAdmin):
-    list_display = ["created_at", "name", "email", "short_message", "is_read"]
-    list_display_links = ["created_at", "name"]
+    list_display = ["created_at", "email", "short_message", "is_read"]
+    list_display_links = ["created_at", "email"]
     list_filter = ["is_read", "created_at"]
-    search_fields = ["name", "email", "message"]
+    search_fields = ["email", "message"]
     date_hierarchy = "created_at"  # навигация по датам над списком
 
     # Сообщение посетителя не редактируем — только читаем и отмечаем.
-    fields = ["created_at", "name", "email", "message", "is_read"]
-    readonly_fields = ["created_at", "name", "email", "message"]
+    fields = ["created_at", "email", "message", "is_read"]
+    readonly_fields = ["created_at", "email", "message"]
     actions = ["mark_as_read", "mark_as_unread"]
 
     @admin.display(description="сообщение")

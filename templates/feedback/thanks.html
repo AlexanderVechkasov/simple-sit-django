@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Сообщение отправлено — Историческая шкала России{% endblock %}
+
+{% block content %}
+<main id="main" class="article-page message-page">
+    <p class="article-years">Сообщение отправлено</p>
+    <h1 class="article-title">Спасибо!</h1>
+    <p class="lead">Мы прочитаем сообщение и ответим на указанную почту.</p>
+    <p>
+        <a class="read-more" href="{% url 'timeline:index' %}">
+            На главную шкалу <span aria-hidden="true">→</span>
+        </a>
+    </p>
+</main>
+{% endblock %}
