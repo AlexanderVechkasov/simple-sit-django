@@ -27,9 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // После загрузки ставим фокус туда, где он нужен человеку:
-    // на первое поле с ошибкой, на «Спасибо» или на первое поле формы.
+    // на первое поле с ошибкой, на общее сообщение об ошибке,
+    // на «Спасибо» или на первое поле формы.
     function placeFocus() {
         const target = body.querySelector('[aria-invalid="true"]')
+            || body.querySelector('.form-summary')
             || body.querySelector('.feedback-success-text')
             || body.querySelector('input:not([type="hidden"]), textarea');
         if (target) target.focus();

@@ -7,6 +7,13 @@ class FeedbackForm(forms.ModelForm):
     """Почта и текст сообщения. Проверки длины и формата почты Django
     берёт из модели, а свои тексты ошибок задаём ниже — по-человечески."""
 
+    # Ловушка для ботов (honeypot).
+    homepage = forms.CharField(
+        label="Не заполняйте это поле",
+        required=False,
+        widget=forms.TextInput(attrs={"tabindex": "-1", "autocomplete": "off"}),
+    )
+
     class Meta:
         model = FeedbackMessage
         fields = ["email", "message"]
@@ -44,3 +51,7 @@ class FeedbackForm(forms.ModelForm):
         if len(message) < 10:
             raise forms.ValidationError("Сообщение слишком короткое — напишите хотя бы пару слов.")
         return message
+
+    def is_spam(self):
+        """Ловушка заполнена — значит, форму отправил бот."""
+        return bool(self.cleaned_data.get("homepage"))
