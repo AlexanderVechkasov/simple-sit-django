@@ -14,18 +14,15 @@
     <link rel="preload" href="{% static 'fonts/inter-cyrillic-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{% static 'css/site.css' %}">
     {% block extra_head %}{% endblock %}
-
     <script src="{% static 'js/timeline.js' %}" defer></script>
+    <script src="{% static 'js/feedback.js' %}" defer></script>
 </head>
 <body>
     {% include "includes/header.html" %}
-
     {% block content %}{% endblock %}
-
     {% include "includes/footer.html" %}
-
     {% include "includes/gallery.html" %}
-
+    {% include "includes/feedback_dialog.html" %}
     {% block extra_js %}{% endblock %}
 </body>
 </html>

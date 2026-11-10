@@ -1,0 +1,17 @@
+{# Окно «Написать нам». Форму внутрь подгружает static/js/feedback.js #}
+<dialog id="feedbackDialog" class="modal" aria-labelledby="feedbackDialogTitle"
+        data-url="{% url 'feedback:form' %}">
+    <div class="modal-inner">
+        <div class="modal-header">
+            <h2 class="modal-title" id="feedbackDialogTitle">Написать нам</h2>
+            <button type="button" class="icon-button" data-dialog-close aria-label="Закрыть окно">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" aria-hidden="true" focusable="false">
+                    <path d="M6 6l12 12M18 6 6 18"/>
+                </svg>
+            </button>
+        </div>
+        <p class="modal-intro">Ошибка в статье, дополнение или идея нового события — ответим на почту.</p>
+        <div class="modal-body"></div>
+    </div>
+</dialog>
