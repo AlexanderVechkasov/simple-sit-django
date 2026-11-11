@@ -4,8 +4,8 @@
 """
 
 from pathlib import Path
-
 import environ
+from django.urls import reverse_lazy
 
 # Корень проекта — папка, где лежит manage.py.
 # Этот файл лежит в config/settings/base.py, поэтому поднимаемся на три уровня.
@@ -28,6 +28,7 @@ CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 ADMIN_URL = env("ADMIN_URL")
 
 INSTALLED_APPS = [
+    "unfold",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -102,3 +103,76 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # Загруженные файлы — картинки событий.
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# Оформление админки (Unfold): название, цвета и боковое меню.
+UNFOLD = {
+    "SITE_TITLE": "Историческая шкала",
+    "SITE_HEADER": "Историческая шкала",
+    "SITE_SUBHEADER": "Панель управления",
+    "SITE_SYMBOL": "history_edu",  # значок из набора Material Symbols
+    "SITE_URL": "/",
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    # Основной цвет — тёмно-синий, как на сайте. Оттенки от светлого (50)
+    # до тёмного (950) в формате oklch; Unfold сам выбирает нужные.
+    "COLORS": {
+        "primary": {
+            "50": "oklch(97% 0.014 254.604)",
+            "100": "oklch(93.2% 0.032 255.585)",
+            "200": "oklch(88.2% 0.059 254.128)",
+            "300": "oklch(80.9% 0.105 251.813)",
+            "400": "oklch(62.3% 0.214 259.815)",
+            "500": "oklch(54.6% 0.245 262.881)",
+            "600": "oklch(42.4% 0.199 265.638)",
+            "700": "oklch(37.9% 0.146 265.522)",
+            "800": "oklch(28.2% 0.091 267.935)",
+            "900": "oklch(24% 0.075 268)",
+            "950": "oklch(19% 0.06 268)",
+        },
+    },
+    # Боковое меню: свои разделы, названия и значки.
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": False,
+        "navigation": [
+            {
+                "title": "Историческая шкала",
+                "items": [
+                    {
+                        "title": "События",
+                        "icon": "timeline",
+                        "link": reverse_lazy("admin:timeline_event_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "Обратная связь",
+                "items": [
+                    {
+                        "title": "Сообщения",
+                        "icon": "mail",
+                        "link": reverse_lazy("admin:feedback_feedbackmessage_changelist"),
+                        # Число непрочитанных — функция в feedback/admin.py
+                        "badge": "feedback.admin.unread_badge",
+                    },
+                ],
+            },
+            {
+                "title": "Доступ",
+                "collapsible": True,  # раздел можно свернуть
+                "items": [
+                    {
+                        "title": "Пользователи",
+                        "icon": "person",
+                        "link": reverse_lazy("admin:auth_user_changelist"),
+                    },
+                    {
+                        "title": "Группы",
+                        "icon": "group",
+                        "link": reverse_lazy("admin:auth_group_changelist"),
+                    },
+                ],
+            },
+        ],
+    },
+}

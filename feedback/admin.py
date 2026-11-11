@@ -2,12 +2,21 @@
 
 from django.contrib import admin
 from django.utils.text import Truncator
-
+from unfold.admin import ModelAdmin
 from .models import FeedbackMessage
 
 
+def unread_badge(request):
+    """Число непрочитанных сообщений — для значка в боковом меню.
+
+    Пустая строка вместо нуля: значок не показывается, когда всё прочитано.
+    """
+    count = FeedbackMessage.objects.filter(is_read=False).count()
+    return count or ""
+
+
 @admin.register(FeedbackMessage)
-class FeedbackMessageAdmin(admin.ModelAdmin):
+class FeedbackMessageAdmin(ModelAdmin):
     list_display = ["created_at", "email", "short_message", "is_read"]
     list_display_links = ["created_at", "email"]
     list_filter = ["is_read", "created_at"]

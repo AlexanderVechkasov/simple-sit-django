@@ -1,14 +1,14 @@
-"""Настройка админки для событий и изображений."""
+"""Админка: события с изображениями, а также пользователи и группы."""
 
 from django.contrib import admin
+from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import Group, User
 from django.utils.html import format_html
+from unfold.admin import ModelAdmin, TabularInline
+from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
 
 from .models import Event, EventImage
-
-# Заголовки админки вместо стандартного «Администрирование Django».
-admin.site.site_header = "Историческая шкала России"
-admin.site.site_title = "Историческая шкала"
-admin.site.index_title = "Управление сайтом"
 
 
 class CenturyFilter(admin.SimpleListFilter):
@@ -34,11 +34,12 @@ class CenturyFilter(admin.SimpleListFilter):
         return queryset
 
 
-class EventImageInline(admin.TabularInline):
-    """Картинки редактируются прямо на странице события, таблицей внизу."""
+class EventImageInline(TabularInline):
+    """Картинки события — на отдельной вкладке «Изображения»."""
 
     model = EventImage
     extra = 1  # одна пустая строка для новой картинки
+    tab = True  # показать отдельной вкладкой (возможность Unfold)
     fields = ["preview", "image", "caption", "source", "order"]
     readonly_fields = ["preview"]
 
@@ -54,7 +55,7 @@ class EventImageInline(admin.TabularInline):
 
 
 @admin.register(Event)
-class EventAdmin(admin.ModelAdmin):
+class EventAdmin(ModelAdmin):
     # Столбцы в списке событий.
     list_display = ["years", "title", "region", "outcome", "order"]
     list_display_links = ["years", "title"]
@@ -64,19 +65,44 @@ class EventAdmin(admin.ModelAdmin):
     search_fields = ["title", "summary", "region", "key"]
     list_per_page = 30
 
-    # При создании события адрес заполняется сам из года и заголовка
-    # (Django переводит кириллицу в латиницу).
+    # При создании события адрес заполняется сам из года и заголовка.
     prepopulated_fields = {"slug": ["start_year", "title"]}
     readonly_fields = ["created_at", "updated_at"]
     inlines = [EventImageInline]
 
-    # Поля на странице события, разбитые на блоки.
+    # Поля события разложены по вкладкам (classes: ["tab"] — возможность Unfold).
     fieldsets = [
-        (None, {"fields": ["title", ("start_year", "end_year"), "slug", "key"]}),
-        ("Описание", {"fields": ["summary", "region", "outcome", "body"]}),
-        ("Служебное", {"fields": ["order", ("created_at", "updated_at")]}),
+        ("Основное", {
+            "classes": ["tab"],
+            "fields": ["title", ("start_year", "end_year"), "region", "outcome"],
+        }),
+        ("Тексты", {
+            "classes": ["tab"],
+            "fields": ["summary", "body"],
+        }),
+        ("Адрес и порядок", {
+            "classes": ["tab"],
+            "fields": ["slug", "key", "order", ("created_at", "updated_at")],
+        }),
     ]
 
     @admin.display(description="годы", ordering="start_year")
     def years(self, obj):
         return obj.years_display
+
+
+# Пользователи и группы: те же стандартные страницы Django, но в оформлении Unfold.
+admin.site.unregister(User)
+admin.site.unregister(Group)
+
+
+@admin.register(User)
+class UserAdmin(BaseUserAdmin, ModelAdmin):
+    form = UserChangeForm
+    add_form = UserCreationForm
+    change_password_form = AdminPasswordChangeForm
+
+
+@admin.register(Group)
+class GroupAdmin(BaseGroupAdmin, ModelAdmin):
+    pass
