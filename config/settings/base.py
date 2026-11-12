@@ -93,6 +93,8 @@ LANGUAGE_CODE = "ru"
 TIME_ZONE = "Europe/Moscow"
 USE_I18N = True
 USE_TZ = True
+# Свои переводы проекта (например, надписи Unfold) — в папке locale/
+LOCALE_PATHS = [BASE_DIR / "locale"]
 
 # Статика (CSS, JS, иконки).
 STATIC_URL = "static/"

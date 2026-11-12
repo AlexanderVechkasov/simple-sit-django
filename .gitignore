@@ -226,3 +226,5 @@ __marimo__/
 media/
 # Статика, собранная командой collectstatic для сервера
 staticfiles/
+# Наш перевод Unfold храним в git
+!locale/ru/LC_MESSAGES/django.mo
