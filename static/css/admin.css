@@ -170,3 +170,35 @@
 .message-dialog-button .material-symbols-outlined {
     font-size: 18px;
 }
+
+/* Статус сообщения в списке: «Новое» / «Прочитано» */
+.message-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background-color: var(--color-base-100);
+    color: var(--color-base-600);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.message-status.is-unread {
+    background-color: var(--color-primary-100);
+    color: var(--color-primary-700);
+}
+
+.dark .message-status {
+    background-color: var(--color-base-800);
+    color: var(--color-base-300);
+}
+
+.dark .message-status.is-unread {
+    background-color: var(--color-primary-900);
+    color: var(--color-primary-200);
+}
+
+/* Вся строка сообщения кликабельна */
+.message-row {
+    cursor: pointer;
+}

@@ -1,9 +1,10 @@
 /*
  * Админка → «Сообщения»: просмотр сообщения во всплывающем окне.
  *
- * Кнопка «Прочитать» в списке открывает окно с полным текстом.
+ * Окно открывается кнопкой «Прочитать» или кликом по строке сообщения.
  * Данные приходят с нашего адреса …/<номер>/read/, и сообщение там же
- * отмечается прочитанным. Без JS остаётся обычный переход по ссылке.
+ * отмечается прочитанным. Статус в строке и число в меню меняются сразу,
+ * без перезагрузки страницы.
  */
 document.addEventListener('DOMContentLoaded', () => {
     const buttons = document.querySelectorAll('.message-open');
@@ -24,8 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         actions: dialog.querySelector('.message-dialog-actions'),
     };
 
-    let opener = null;     // кнопка, с которой открыли окно
-    let changed = false;   // отметили ли что-то прочитанным
+    let opener = null; // кнопка «Прочитать» в строке, откуда открыли окно
 
     // Разметка окна. Здесь нет данных посетителя — их вставляем ниже
     // через textContent, поэтому чужой HTML выполниться не может.
@@ -78,6 +78,16 @@ document.addEventListener('DOMContentLoaded', () => {
         fields.actions.hidden = true;
     }
 
+    // Статус «Новое» → «Прочитано» прямо в строке списка.
+    function markRowAsRead(button) {
+        const row = button.closest('tr');
+        const status = row && row.querySelector('.message-status');
+        if (status) {
+            status.classList.remove('is-unread');
+            status.textContent = 'Прочитано';
+        }
+    }
+
     async function openMessage(button) {
         opener = button;
         showLoading();
@@ -90,8 +100,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             if (!response.ok) throw new Error(`Сервер ответил ${response.status}`);
             const data = await response.json();
-            if (data.was_unread) changed = true;
             showMessage(data);
+            markRowAsRead(button);
+            // Число непрочитанных в меню и на «Сводке» (функция из admin-live.js)
+            if (window.updateUnreadCount) window.updateUnreadCount(data.unread);
         } catch (error) {
             showError();
         }
@@ -99,6 +111,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     buttons.forEach((button) => {
         button.addEventListener('click', () => openMessage(button));
+
+        // Клик по любому месту строки тоже открывает окно —
+        // кроме галочки выбора, ссылок и кнопок.
+        const row = button.closest('tr');
+        if (row) {
+            row.classList.add('message-row');
+            row.addEventListener('click', (event) => {
+                if (event.target.closest('input, a, button, label')) return;
+                openMessage(button);
+            });
+        }
     });
 
     // Закрытие: кнопки с data-close или клик по затемнённому фону. Esc — сам браузер.
@@ -108,12 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // После закрытия фокус возвращается на кнопку «Прочитать» этой строки.
     dialog.addEventListener('close', () => {
-        if (changed) {
-            // Обновляем страницу, чтобы в списке и в меню сменились отметки.
-            window.location.reload();
-        } else if (opener) {
-            opener.focus();
-        }
+        if (opener) opener.focus();
     });
 });

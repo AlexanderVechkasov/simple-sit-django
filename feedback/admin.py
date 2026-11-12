@@ -29,8 +29,10 @@ def unread_badge(request):
 
 @admin.register(FeedbackMessage)
 class FeedbackMessageAdmin(ModelAdmin):
-    list_display = ["created_at", "email", "short_message", "is_read", "read_button"]
-    list_display_links = ["created_at", "email"]
+    list_display = ["created_at", "email", "short_message", "status", "read_button"]
+    # Строки не ведут на отдельную страницу: клик по строке открывает окно
+    # (см. static/js/admin-messages.js). Полная страница — кнопкой в окне.
+    list_display_links = None
     list_filter = ["is_read", "created_at"]
     search_fields = ["email", "message"]
     date_hierarchy = "created_at"  # навигация по датам над списком
@@ -49,6 +51,13 @@ class FeedbackMessageAdmin(ModelAdmin):
         """Первые 80 символов сообщения для списка."""
         return Truncator(obj.message).chars(80)
 
+    @admin.display(description="статус", ordering="is_read")
+    def status(self, obj):
+        """«Новое» или «Прочитано». JS меняет надпись без перезагрузки."""
+        if obj.is_read:
+            return format_html('<span class="message-status">{}</span>', "Прочитано")
+        return format_html('<span class="message-status is-unread">{}</span>', "Новое")
+
     @admin.display(description="")
     def read_button(self, obj):
         """Кнопка, которая открывает сообщение во всплывающем окне."""
@@ -59,7 +68,7 @@ class FeedbackMessageAdmin(ModelAdmin):
         )
 
     def get_urls(self):
-        """Свой адрес в админке: …/feedbackmessage/<номер>/read/."""
+        """Свои адреса в админке: …/<номер>/read/ и …/status/."""
         custom_urls = [
             path(
                 "<int:pk>/read/",
@@ -67,9 +76,28 @@ class FeedbackMessageAdmin(ModelAdmin):
                 self.admin_site.admin_view(self.read_view),
                 name="feedback_feedbackmessage_read",
             ),
+            path(
+                "status/",
+                self.admin_site.admin_view(self.status_view),
+                name="feedback_feedbackmessage_status",
+            ),
         ]
         # Свои адреса — первыми, иначе их перехватят стандартные.
         return custom_urls + super().get_urls()
+
+    def status_view(self, request):
+        """Сводка для «живого» обновления: сколько непрочитанных и какое последнее.
+
+        Её раз в 20 секунд спрашивает static/js/admin-live.js на всех страницах админки.
+        """
+        if not self.has_view_permission(request):
+            raise PermissionDenied
+        latest = FeedbackMessage.objects.order_by("-pk").first()
+        return JsonResponse({
+            "unread": FeedbackMessage.objects.filter(is_read=False).count(),
+            "latest_id": latest.pk if latest else 0,
+            "latest_email": latest.email if latest else "",
+        })
 
     def read_view(self, request, pk):
         """Отдаёт сообщение окну «Прочитать» и отмечает его прочитанным."""
@@ -91,6 +119,7 @@ class FeedbackMessageAdmin(ModelAdmin):
             "received": f"{received:%d.%m.%Y %H:%M}",
             "message": message.message,
             "was_unread": was_unread,
+            "unread": FeedbackMessage.objects.filter(is_read=False).count(),
             "reply_url": f"mailto:{message.email}?subject={quote(REPLY_SUBJECT)}",
             "change_url": reverse("admin:feedback_feedbackmessage_change", args=[message.pk]),
         })
