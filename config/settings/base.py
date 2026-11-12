@@ -116,6 +116,8 @@ UNFOLD = {
     "SITE_URL": "/",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
+# Данные для «Сводки» на главной странице админки
+    "DASHBOARD_CALLBACK": "timeline.dashboard.dashboard_callback",
 # Наш CSS поверх оформления Unfold
     "STYLES": [lambda request: static("css/admin.css")],
     # Основной цвет — тёмно-синий, как на сайте. Оттенки от светлого (50)

@@ -6,10 +6,9 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group, User
 from django.utils.html import format_html
 from unfold.admin import ModelAdmin, TabularInline
+from unfold.decorators import display
 from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
-
 from .models import Event, EventImage
-
 
 class CenturyFilter(admin.SimpleListFilter):
     """Фильтр справа в списке: события по векам (по году начала)."""
@@ -34,6 +33,23 @@ class CenturyFilter(admin.SimpleListFilter):
         return queryset
 
 
+class HasImageFilter(admin.SimpleListFilter):
+    """Фильтр: есть ли у события хотя бы одно изображение."""
+
+    title = "изображение"
+    parameter_name = "has_image"
+
+    def lookups(self, request, model_admin):
+        return [("yes", "есть"), ("no", "нет")]
+
+    def queryset(self, request, queryset):
+        if self.value() == "yes":
+            return queryset.filter(images__isnull=False).distinct()
+        if self.value() == "no":
+            return queryset.filter(images__isnull=True)
+        return queryset
+
+
 class EventImageInline(TabularInline):
     """Картинки события — на отдельной вкладке «Изображения»."""
 
@@ -47,21 +63,18 @@ class EventImageInline(TabularInline):
     def preview(self, obj):
         if obj.image:
             # format_html безопасно подставляет значения в HTML.
-            return format_html(
-                '<img src="{}" alt="" style="max-height: 80px; max-width: 120px;">',
-                obj.image.url,
-            )
+            return format_html('<img src="{}" alt="" class="admin-thumb">', obj.image.url)
         return "—"
 
 
 @admin.register(Event)
 class EventAdmin(ModelAdmin):
     # Столбцы в списке событий.
-    list_display = ["years", "title", "region", "outcome", "order"]
-    list_display_links = ["years", "title"]
+    list_display = ["thumbnail", "years", "title", "region", "outcome_label", "order"]
+    list_display_links = ["thumbnail", "years", "title"]
     # Порядок можно менять прямо в списке, не открывая событие.
     list_editable = ["order"]
-    list_filter = [CenturyFilter, "outcome"]
+    list_filter = [CenturyFilter, "outcome", HasImageFilter]
     search_fields = ["title", "summary", "region", "key"]
     list_per_page = 30
 
@@ -86,9 +99,41 @@ class EventAdmin(ModelAdmin):
         }),
     ]
 
+    def get_queryset(self, request):
+        # Картинки всех событий на странице — одним запросом (для превью).
+        return super().get_queryset(request).prefetch_related("images")
+
     @admin.display(description="годы", ordering="start_year")
     def years(self, obj):
         return obj.years_display
+
+    @admin.display(description="")
+    def thumbnail(self, obj):
+        """Маленькое превью первой картинки события."""
+        images = obj.images.all()
+        if images:
+            return format_html('<img src="{}" alt="" class="admin-thumb">', images[0].image.url)
+        return "—"
+
+    # Итог цветной меткой: ключ из базы → цвет метки Unfold.
+    @display(
+        description="итог",
+        ordering="outcome",
+        label={
+            Event.Outcome.VICTORY: "success",
+            Event.Outcome.DEFEAT: "danger",
+            Event.Outcome.DRAW: "warning",
+            Event.Outcome.UNDETERMINED: "info",
+        },
+    )
+    def outcome_label(self, obj):
+        if not obj.outcome:
+            return None
+        return obj.outcome, obj.get_outcome_display()
+
+
+# Заголовок главной страницы админки (вместо «Администрирование сайта»).
+admin.site.index_title = "Сводка"
 
 
 # Пользователи и группы: те же стандартные страницы Django, но в оформлении Unfold.

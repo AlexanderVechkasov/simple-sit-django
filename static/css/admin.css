@@ -7,3 +7,12 @@
 .theme-switch .material-symbols-outlined {
     font-size: 24px;
 }
+
+/* Маленькое превью картинки события в списке и на вкладке «изображения» */
+.admin-thumb {
+    width: 64px;
+    max-width: none; /* Unfold по умолчанию сжимает картинки по ширине ячейки */
+    height: 48px;
+    object-fit: cover;
+    border-radius: 6px;
+}

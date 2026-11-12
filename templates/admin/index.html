@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+{% load i18n unfold %}
+
+{% comment %}
+    Главная страница админки: карточки со сводкой, новые сообщения
+    и последние действия. Данные готовит timeline/dashboard.py.
+{% endcomment %}
+
+{% block title %}{{ title }} | {{ site_title }}{% endblock %}
+
+{% block branding %}
+    {% include "unfold/helpers/site_branding.html" %}
+{% endblock %}
+
+{% block content %}
+    <div class="flex flex-col lg:flex-row gap-6">
+        <div class="flex flex-col gap-6 grow">
+            <div class="flex flex-col lg:flex-row gap-6">
+                {% for stat in stats %}
+                {% component "unfold/components/card.html" with href=stat.url title=stat.title title_icon=stat.icon %}
+                        {% component "unfold/components/title.html" %}{{ stat.value }}{% endcomponent %}
+                        {% component "unfold/components/text.html" with class="text-subtle" %}{{ stat.note }}{% endcomponent %}
+                    {% endcomponent %}
+                {% endfor %}
+            </div>
+
+            {% component "unfold/components/card.html" with title="Новые сообщения" %}
+                {% if latest_messages.rows %}
+                    {% component "unfold/components/table.html" with table=latest_messages card_included=1 %}{% endcomponent %}
+                {% else %}
+                    {% component "unfold/components/text.html" %}Непрочитанных сообщений нет.{% endcomponent %}
+                {% endif %}
+            {% endcomponent %}
+        </div>
+
+        {% include "unfold/helpers/history.html" %}
+    </div>
+{% endblock %}
