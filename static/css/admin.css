@@ -1,0 +1,9 @@
+/*
+ * Наши правки оформления админки (Unfold).
+ * Подключается через настройку UNFOLD["STYLES"] в config/settings/base.py.
+ */
+
+/* Переключатель темы в меню пользователя: значки покрупнее */
+.theme-switch .material-symbols-outlined {
+    font-size: 24px;
+}

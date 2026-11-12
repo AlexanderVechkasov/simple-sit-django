@@ -5,6 +5,7 @@
 
 from pathlib import Path
 import environ
+from django.templatetags.static import static
 from django.urls import reverse_lazy
 
 # Корень проекта — папка, где лежит manage.py.
@@ -115,6 +116,8 @@ UNFOLD = {
     "SITE_URL": "/",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
+# Наш CSS поверх оформления Unfold
+    "STYLES": [lambda request: static("css/admin.css")],
     # Основной цвет — тёмно-синий, как на сайте. Оттенки от светлого (50)
     # до тёмного (950) в формате oklch; Unfold сам выбирает нужные.
     "COLORS": {
