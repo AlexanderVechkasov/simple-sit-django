@@ -18,7 +18,7 @@
             <div class="flex flex-col lg:flex-row gap-6">
                 {% for stat in stats %}
                 {% component "unfold/components/card.html" with href=stat.url title=stat.title title_icon=stat.icon %}
-                        {% component "unfold/components/title.html" %}{{ stat.value }}{% endcomponent %}
+                        {% component "unfold/components/title.html" %}<span{% if stat.live %} data-unread-count{% endif %}>{{ stat.value }}</span>{% endcomponent %}
                         {% component "unfold/components/text.html" with class="text-subtle" %}{{ stat.note }}{% endcomponent %}
                     {% endcomponent %}
                 {% endfor %}

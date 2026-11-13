@@ -49,6 +49,7 @@ def dashboard_callback(request, context):
             "note": "Обратная связь с сайта",
             "icon": "mail",
             "url": f"{messages_url}?is_read__exact=0",
+            "live": True,
         },
     ]
 

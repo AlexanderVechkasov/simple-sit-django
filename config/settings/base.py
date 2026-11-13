@@ -120,6 +120,7 @@ UNFOLD = {
     "DASHBOARD_CALLBACK": "timeline.dashboard.dashboard_callback",
 # Наш CSS поверх оформления Unfold
     "STYLES": [lambda request: static("css/admin.css")],
+    "SCRIPTS": [lambda request: static("js/admin-live.js")],
     # Основной цвет — тёмно-синий, как на сайте. Оттенки от светлого (50)
     # до тёмного (950) в формате oklch; Unfold сам выбирает нужные.
     "COLORS": {
@@ -161,6 +162,8 @@ UNFOLD = {
                         "link": reverse_lazy("admin:feedback_feedbackmessage_changelist"),
                         # Число непрочитанных — функция в feedback/admin.py
                         "badge": "feedback.admin.unread_badge",
+                        # Адрес, который admin-live.js опрашивает раз в 20 секунд
+                        "link_attrs": {"data-status-url": reverse_lazy("admin:feedback_feedbackmessage_status")},
                     },
                 ],
             },
