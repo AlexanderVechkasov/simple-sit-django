@@ -267,3 +267,17 @@
         animation: none;
     }
 }
+
+/* Ссылка на сообщение в таблице «Новые сообщения» на «Сводке» */
+.message-link {
+    color: var(--color-primary-600);
+    font-weight: 500;
+}
+
+.message-link:hover {
+    text-decoration: underline;
+}
+
+.dark .message-link {
+    color: var(--color-primary-300);
+}

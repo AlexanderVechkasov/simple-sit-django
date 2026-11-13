@@ -120,7 +120,10 @@ UNFOLD = {
     "DASHBOARD_CALLBACK": "timeline.dashboard.dashboard_callback",
 # Наш CSS поверх оформления Unfold
     "STYLES": [lambda request: static("css/admin.css")],
-    "SCRIPTS": [lambda request: static("js/admin-live.js")],
+    "SCRIPTS": [
+        lambda request: static("js/admin-live.js"),
+        lambda request: static("js/admin-messages.js"),
+    ],
     # Основной цвет — тёмно-синий, как на сайте. Оттенки от светлого (50)
     # до тёмного (950) в формате oklch; Unfold сам выбирает нужные.
     "COLORS": {

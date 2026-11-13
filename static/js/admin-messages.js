@@ -1,16 +1,20 @@
 /*
- * Админка → «Сообщения»: просмотр сообщения во всплывающем окне.
+ * Админка: просмотр сообщения во всплывающем окне.
  *
- * Окно открывается кнопкой «Прочитать» или кликом по строке сообщения.
+ * Работает в списке «Сообщения» и в таблице «Новые сообщения» на «Сводке».
+ * Окно открывается кнопкой «Прочитать», ссылкой на сообщение
+ * или кликом по строке.
  * Данные приходят с нашего адреса …/<номер>/read/, и сообщение там же
  * отмечается прочитанным. Статус в строке и число в меню меняются сразу,
  * без перезагрузки страницы.
  */
 document.addEventListener('DOMContentLoaded', () => {
-    const buttons = document.querySelectorAll('.message-open');
-    if (!buttons.length) return;
+    // .message-open — кнопка «Прочитать» в списке, .message-link — ссылка на «Сводке»
+    const openers = document.querySelectorAll('.message-open, .message-link');
+    if (!openers.length) return; // на этой странице сообщений нет
 
-    // CSRF-токен берём из формы действий, которая уже есть на странице списка.
+    // CSRF-токен берём из формы, которая есть на каждой странице админки
+    // (например, кнопка «Выйти»).
     const tokenInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
 
     const dialog = createDialog();
@@ -25,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         actions: dialog.querySelector('.message-dialog-actions'),
     };
 
-    let opener = null; // кнопка «Прочитать» в строке, откуда открыли окно
+    let opener = null; // кнопка или ссылка, откуда открыли окно
 
     // Разметка окна. Здесь нет данных посетителя — их вставляем ниже
     // через textContent, поэтому чужой HTML выполниться не может.
@@ -79,8 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Статус «Новое» → «Прочитано» прямо в строке списка.
-    function markRowAsRead(button) {
-        const row = button.closest('tr');
+    function markRowAsRead(trigger) {
+        const row = trigger.closest('tr');
         const status = row && row.querySelector('.message-status');
         if (status) {
             status.classList.remove('is-unread');
@@ -88,12 +92,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function openMessage(button) {
-        opener = button;
+    async function openMessage(trigger) {
+        opener = trigger;
         showLoading();
         dialog.showModal();
         try {
-            const response = await fetch(button.dataset.url, {
+            const response = await fetch(trigger.dataset.url, {
                 method: 'POST',
                 headers: { 'X-CSRFToken': tokenInput ? tokenInput.value : '' },
                 credentials: 'same-origin',
@@ -101,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(`Сервер ответил ${response.status}`);
             const data = await response.json();
             showMessage(data);
-            markRowAsRead(button);
+            markRowAsRead(trigger);
             // Число непрочитанных в меню и на «Сводке» (функция из admin-live.js)
             if (window.updateUnreadCount) window.updateUnreadCount(data.unread);
         } catch (error) {
@@ -109,17 +113,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    buttons.forEach((button) => {
-        button.addEventListener('click', () => openMessage(button));
+    openers.forEach((trigger) => {
+        trigger.addEventListener('click', (event) => {
+            event.preventDefault(); // ссылка не уходит на другую страницу
+            openMessage(trigger);
+        });
 
         // Клик по любому месту строки тоже открывает окно —
         // кроме галочки выбора, ссылок и кнопок.
-        const row = button.closest('tr');
+        const row = trigger.closest('tr');
         if (row) {
             row.classList.add('message-row');
             row.addEventListener('click', (event) => {
                 if (event.target.closest('input, a, button, label')) return;
-                openMessage(button);
+                openMessage(trigger);
             });
         }
     });
@@ -131,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // После закрытия фокус возвращается на кнопку «Прочитать» этой строки.
+    // После закрытия фокус возвращается туда, откуда окно открыли.
     dialog.addEventListener('close', () => {
         if (opener) opener.focus();
     });

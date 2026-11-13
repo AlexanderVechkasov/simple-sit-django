@@ -42,10 +42,6 @@ class FeedbackMessageAdmin(ModelAdmin):
     readonly_fields = ["created_at", "email", "message"]
     actions = ["mark_as_read", "mark_as_unread"]
 
-    class Media:
-        # Окно «Прочитать» в списке сообщений
-        js = ["js/admin-messages.js"]
-
     @admin.display(description="сообщение")
     def short_message(self, obj):
         """Первые 80 символов сообщения для списка."""
