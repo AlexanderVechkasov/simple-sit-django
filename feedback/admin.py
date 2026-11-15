@@ -1,17 +1,15 @@
 """Чтение сообщений обратной связи в админке."""
 
 from urllib.parse import quote
-
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseNotAllowed, JsonResponse
+from django.http import HttpResponseBadRequest, HttpResponseNotAllowed, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.text import Truncator
 from unfold.admin import ModelAdmin
-
 from .models import FeedbackMessage
 
 # Тема письма, когда нажимаешь «Ответить»
@@ -42,6 +40,10 @@ class FeedbackMessageAdmin(ModelAdmin):
     readonly_fields = ["created_at", "email", "message"]
     actions = ["mark_as_read", "mark_as_unread"]
 
+    class Media:
+        # Панель кнопок «Прочитано / Не прочитано / Удалить» над списком
+        js = ["js/admin-message-toolbar.js"]
+
     @admin.display(description="сообщение")
     def short_message(self, obj):
         """Первые 80 символов сообщения для списка."""
@@ -64,13 +66,18 @@ class FeedbackMessageAdmin(ModelAdmin):
         )
 
     def get_urls(self):
-        """Свои адреса в админке: …/<номер>/read/ и …/status/."""
+        """Свои адреса в админке: …/<номер>/read/, …/bulk/ и …/status/."""
         custom_urls = [
             path(
                 "<int:pk>/read/",
                 # admin_view: только для вошедших в админку + защита CSRF
                 self.admin_site.admin_view(self.read_view),
                 name="feedback_feedbackmessage_read",
+            ),
+            path(
+                "bulk/",
+                self.admin_site.admin_view(self.bulk_view),
+                name="feedback_feedbackmessage_bulk",
             ),
             path(
                 "status/",
@@ -80,6 +87,37 @@ class FeedbackMessageAdmin(ModelAdmin):
         ]
         # Свои адреса — первыми, иначе их перехватят стандартные.
         return custom_urls + super().get_urls()
+
+    def changelist_view(self, request, extra_context=None):
+        # Какие кнопки показать на панели над списком — по правам пользователя.
+        extra_context = {
+            **(extra_context or {}),
+            "can_change": self.has_change_permission(request),
+            "can_delete": self.has_delete_permission(request),
+        }
+        return super().changelist_view(request, extra_context)
+
+    def bulk_view(self, request):
+        """Кнопки «Прочитано» / «Не прочитано» на панели над списком.
+
+        Принимает action=read|unread и номера сообщений ids, отвечает JSON.
+        """
+        if request.method != "POST":
+            return HttpResponseNotAllowed(["POST"])
+        if not self.has_change_permission(request):
+            raise PermissionDenied
+
+        action = request.POST.get("action")
+        if action not in ("read", "unread"):
+            return HttpResponseBadRequest("Неизвестное действие")
+        # Берём только числа: всё остальное в ids просто отбрасываем.
+        ids = [int(pk) for pk in request.POST.getlist("ids") if pk.isdigit()]
+
+        changed = FeedbackMessage.objects.filter(pk__in=ids).update(is_read=(action == "read"))
+        return JsonResponse({
+            "changed": changed,
+            "unread": FeedbackMessage.objects.filter(is_read=False).count(),
+        })
 
     def status_view(self, request):
         """Сводка для «живого» обновления: сколько непрочитанных и какое последнее.
