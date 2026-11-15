@@ -113,6 +113,8 @@ UNFOLD = {
     "SITE_HEADER": "Историческая шкала",
     "SITE_SUBHEADER": "Панель управления",
     "SITE_SYMBOL": "history_edu",  # значок из набора Material Symbols
+# Страница входа: справа случайная картина из событий шкалы
+    "LOGIN": {"image": "timeline.login.random_login_image"},
     "SITE_URL": "/",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
