@@ -416,7 +416,58 @@ tr:has(.message-link) {
     color: #ffffff;
 }
 
+/* Цвет фона страницы входа — к нему «растворяется» картина */
+.login #page {
+    --login-bg: #ffffff;
+}
+
+.dark .login #page {
+    --login-bg: var(--color-base-900);
+}
+
 /* Картина справа: показываем середину, а не левый верхний угол */
 .login #page > div[style*="background-image"] {
+    position: relative;
     background-position: center;
+    animation: login-picture-in 1.2s ease-out both;
+}
+
+/* Плавный переход: левый край картины растворяется в фоне формы */
+.login #page > div[style*="background-image"]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to right,
+        var(--login-bg) 0%,
+        color-mix(in srgb, var(--login-bg) 70%, transparent) 12%,
+        color-mix(in srgb, var(--login-bg) 25%, transparent) 30%,
+        transparent 50%
+    );
+}
+
+/* Форма мягко поднимается снизу при открытии страницы */
+.login #page > div:first-child > div {
+    animation: login-form-in 0.6s ease-out both;
+}
+
+@keyframes login-picture-in {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes login-form-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+}
+
+/* Кто отключил анимацию в системе — показываем сразу, без движения */
+@media (prefers-reduced-motion: reduce) {
+    .login #page > div[style*="background-image"],
+    .login #page > div:first-child > div {
+        animation: none;
+    }
 }
