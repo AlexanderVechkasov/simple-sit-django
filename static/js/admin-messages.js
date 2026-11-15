@@ -7,29 +7,22 @@
  * Данные приходят с нашего адреса …/<номер>/read/, и сообщение там же
  * отмечается прочитанным. Статус в строке и число в меню меняются сразу,
  * без перезагрузки страницы.
+ *
+ * Клики ловим на всём документе (делегирование событий), поэтому окно
+ * открывается и для строк, которые появились позже — например, когда
+ * таблица на «Сводке» обновилась сама.
  */
 document.addEventListener('DOMContentLoaded', () => {
     // .message-open — кнопка «Прочитать» в списке, .message-link — ссылка на «Сводке»
-    const openers = document.querySelectorAll('.message-open, .message-link');
-    if (!openers.length) return; // на этой странице сообщений нет
+    const OPENERS = '.message-open, .message-link';
 
     // CSRF-токен берём из формы, которая есть на каждой странице админки
     // (например, кнопка «Выйти»).
     const tokenInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
 
-    const dialog = createDialog();
-    document.body.append(dialog);
-
-    const fields = {
-        email: dialog.querySelector('.js-email'),
-        received: dialog.querySelector('.js-received'),
-        text: dialog.querySelector('.js-text'),
-        reply: dialog.querySelector('.js-reply'),
-        full: dialog.querySelector('.js-full'),
-        actions: dialog.querySelector('.message-dialog-actions'),
-    };
-
-    let opener = null; // кнопка или ссылка, откуда открыли окно
+    let dialog = null;  // окно создаём при первом открытии
+    let fields = null;
+    let opener = null;  // кнопка или ссылка, откуда открыли окно
 
     // Разметка окна. Здесь нет данных посетителя — их вставляем ниже
     // через textContent, поэтому чужой HTML выполниться не может.
@@ -92,7 +85,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function prepareDialog() {
+        if (dialog) return;
+        dialog = createDialog();
+        document.body.append(dialog);
+        fields = {
+            email: dialog.querySelector('.js-email'),
+            received: dialog.querySelector('.js-received'),
+            text: dialog.querySelector('.js-text'),
+            reply: dialog.querySelector('.js-reply'),
+            full: dialog.querySelector('.js-full'),
+            actions: dialog.querySelector('.message-dialog-actions'),
+        };
+
+        // Закрытие: кнопки с data-close или клик по затемнённому фону. Esc — сам браузер.
+        dialog.addEventListener('click', (event) => {
+            if (event.target === dialog || event.target.closest('[data-close]')) {
+                dialog.close();
+            }
+        });
+
+        // После закрытия фокус возвращается туда, откуда окно открыли
+        // (если этой строки уже нет — например, таблица обновилась, — ничего не делаем).
+        dialog.addEventListener('close', () => {
+            if (opener && opener.isConnected) opener.focus();
+        });
+    }
+
     async function openMessage(trigger) {
+        prepareDialog();
         opener = trigger;
         showLoading();
         dialog.showModal();
@@ -113,33 +134,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    openers.forEach((trigger) => {
-        trigger.addEventListener('click', (event) => {
+    document.addEventListener('click', (event) => {
+        // Клик по кнопке «Прочитать» или ссылке на сообщение
+        const trigger = event.target.closest(OPENERS);
+        if (trigger) {
             event.preventDefault(); // ссылка не уходит на другую страницу
             openMessage(trigger);
-        });
+            return;
+        }
 
-        // Клик по любому месту строки тоже открывает окно —
+        // Клик по любому другому месту строки с сообщением —
         // кроме галочки выбора, ссылок и кнопок.
-        const row = trigger.closest('tr');
-        if (row) {
-            row.classList.add('message-row');
-            row.addEventListener('click', (event) => {
-                if (event.target.closest('input, a, button, label')) return;
-                openMessage(trigger);
-            });
-        }
-    });
-
-    // Закрытие: кнопки с data-close или клик по затемнённому фону. Esc — сам браузер.
-    dialog.addEventListener('click', (event) => {
-        if (event.target === dialog || event.target.closest('[data-close]')) {
-            dialog.close();
-        }
-    });
-
-    // После закрытия фокус возвращается туда, откуда окно открыли.
-    dialog.addEventListener('close', () => {
-        if (opener) opener.focus();
+        if (event.target.closest('input, a, button, label, select')) return;
+        const row = event.target.closest('tr');
+        const rowTrigger = row && row.querySelector(OPENERS);
+        if (rowTrigger) openMessage(rowTrigger);
     });
 });

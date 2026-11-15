@@ -199,7 +199,8 @@
 }
 
 /* Вся строка сообщения кликабельна */
-.message-row {
+tr:has(.message-open),
+tr:has(.message-link) {
     cursor: pointer;
 }
 

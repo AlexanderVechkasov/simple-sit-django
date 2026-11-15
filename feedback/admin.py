@@ -4,12 +4,13 @@ from urllib.parse import quote
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseBadRequest, HttpResponseNotAllowed, JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.text import Truncator
 from unfold.admin import ModelAdmin
+from .dashboard import latest_messages_table
 from .models import FeedbackMessage
 
 # Тема письма, когда нажимаешь «Ответить»
@@ -66,7 +67,7 @@ class FeedbackMessageAdmin(ModelAdmin):
         )
 
     def get_urls(self):
-        """Свои адреса в админке: …/<номер>/read/, …/bulk/ и …/status/."""
+        """Свои адреса в админке: …/<номер>/read/, …/bulk/, …/status/ и …/latest/."""
         custom_urls = [
             path(
                 "<int:pk>/read/",
@@ -83,6 +84,11 @@ class FeedbackMessageAdmin(ModelAdmin):
                 "status/",
                 self.admin_site.admin_view(self.status_view),
                 name="feedback_feedbackmessage_status",
+            ),
+            path(
+                "latest/",
+                self.admin_site.admin_view(self.latest_view),
+                name="feedback_feedbackmessage_latest",
             ),
         ]
         # Свои адреса — первыми, иначе их перехватят стандартные.
@@ -132,6 +138,19 @@ class FeedbackMessageAdmin(ModelAdmin):
             "latest_id": latest.pk if latest else 0,
             "latest_email": latest.email if latest else "",
         })
+
+    def latest_view(self, request):
+        """Свежая таблица «Новые сообщения» для «Сводки» — готовым HTML.
+
+        Её запрашивает static/js/admin-live.js, когда меняется число непрочитанных.
+        """
+        if not self.has_view_permission(request):
+            raise PermissionDenied
+        return render(
+            request,
+            "admin/includes/latest_messages.html",
+            {"latest_messages": latest_messages_table()},
+        )
 
     def read_view(self, request, pk):
         """Отдаёт сообщение окну «Прочитать» и отмечает его прочитанным."""

@@ -1,9 +1,7 @@
 """Сводка на главной странице админки (подключена в UNFOLD["DASHBOARD_CALLBACK"])."""
 
 from django.urls import reverse
-from django.utils import timezone
-from django.utils.html import format_html
-from django.utils.text import Truncator
+from feedback.dashboard import latest_messages_table
 from feedback.models import FeedbackMessage
 from .models import Event
 
@@ -53,26 +51,6 @@ def dashboard_callback(request, context):
         },
     ]
 
-    # Последние 5 непрочитанных сообщений — таблицей.
-    # Клик по сообщению открывает окно «Прочитать» (static/js/admin-messages.js);
-    # без JavaScript ссылка просто ведёт на страницу сообщения.
-    rows = []
-    for message in unread[:5]:
-        change_url = reverse("admin:feedback_feedbackmessage_change", args=[message.pk])
-        read_url = reverse("admin:feedback_feedbackmessage_read", args=[message.pk])
-        rows.append([
-            f"{timezone.localtime(message.created_at):%d.%m.%Y %H:%M}",
-            message.email,
-            format_html(
-                '<a href="{}" class="message-link" data-url="{}">{}</a>',
-                change_url,
-                read_url,
-                Truncator(message.message).chars(70),
-            ),
-            format_html('<span class="message-status is-unread">{}</span>', "Новое"),
-        ])
-    context["latest_messages"] = {
-        "headers": ["Получено", "Почта", "Сообщение", "Статус"],
-        "rows": rows,
-    }
+    # Таблица «Новые сообщения» (её же отдаёт автообновление «Сводки»)
+    context["latest_messages"] = latest_messages_table()
     return context

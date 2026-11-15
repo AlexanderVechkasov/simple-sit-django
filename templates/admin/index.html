@@ -17,7 +17,7 @@
         <div class="flex flex-col gap-6 grow">
             <div class="flex flex-col lg:flex-row gap-6">
                 {% for stat in stats %}
-                {% component "unfold/components/card.html" with href=stat.url title=stat.title title_icon=stat.icon %}
+                    {% component "unfold/components/card.html" with href=stat.url title=stat.title title_icon=stat.icon %}
                         {% component "unfold/components/title.html" %}<span{% if stat.live %} data-unread-count{% endif %}>{{ stat.value }}</span>{% endcomponent %}
                         {% component "unfold/components/text.html" with class="text-subtle" %}{{ stat.note }}{% endcomponent %}
                     {% endcomponent %}
@@ -25,11 +25,10 @@
             </div>
 
             {% component "unfold/components/card.html" with title="Новые сообщения" %}
-                {% if latest_messages.rows %}
-                    {% component "unfold/components/table.html" with table=latest_messages card_included=1 %}{% endcomponent %}
-                {% else %}
-                    {% component "unfold/components/text.html" %}Непрочитанных сообщений нет.{% endcomponent %}
-                {% endif %}
+                {# Содержимое обновляется само, когда приходит сообщение (static/js/admin-live.js) #}
+                <div data-latest-messages data-url="{% url 'admin:feedback_feedbackmessage_latest' %}">
+                    {% include "admin/includes/latest_messages.html" %}
+                </div>
             {% endcomponent %}
         </div>
 

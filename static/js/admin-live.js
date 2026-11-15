@@ -1,7 +1,8 @@
 /*
  * «Живая» админка: раз в 20 секунд спрашиваем сервер, сколько непрочитанных
  * сообщений и не пришло ли новое. Обновляем число в меню и на «Сводке»,
- * а о новом сообщении показываем уведомление — без перезагрузки страницы.
+ * таблицу «Новые сообщения» на «Сводке», а о новом сообщении показываем
+ * уведомление — всё без перезагрузки страницы.
  *
  * Подключается на всех страницах админки через UNFOLD["SCRIPTS"].
  */
@@ -15,11 +16,13 @@
 
     let menuLink = null;   // ссылка «Сообщения» в боковом меню
     let latestId = null;   // номер самого нового сообщения, которое мы уже видели
+    let lastUnread = null; // сколько непрочитанных было при прошлой проверке
     let toast = null;
 
     // Обновить число непрочитанных в меню и на «Сводке».
     // Функция доступна и другим скриптам (её вызывает admin-messages.js).
     window.updateUnreadCount = function (count) {
+        lastUnread = count;
         if (menuLink) {
             let badge = menuLink.querySelector('.sidebar-badge');
             if (count > 0) {
@@ -60,15 +63,30 @@
         toast.hidden = false;
     }
 
+    // Перезагрузить только таблицу «Новые сообщения» (если мы на «Сводке»).
+    // Сервер отдаёт готовый HTML из нашего же шаблона.
+    async function refreshLatestMessages() {
+        const box = document.querySelector('[data-latest-messages]');
+        if (!box) return;
+        const response = await fetch(box.dataset.url, { credentials: 'same-origin' });
+        if (response.ok) box.innerHTML = await response.text();
+    }
+
     async function check() {
         try {
             const response = await fetch(menuLink.dataset.statusUrl, { credentials: 'same-origin' });
             if (!response.ok) return;
             const data = await response.json();
+
+            const isFirstCheck = latestId === null;
+            const hasNewMessage = !isFirstCheck && data.latest_id > latestId;
+            // Число изменилось не из-за нас: пришло сообщение, или его прочитали
+            // в другой вкладке, или удалили.
+            const unreadChanged = !isFirstCheck && data.unread !== lastUnread;
+
             window.updateUnreadCount(data.unread);
-            if (latestId !== null && data.latest_id > latestId) {
-                showToast(data.latest_email);
-            }
+            if (hasNewMessage) showToast(data.latest_email);
+            if (hasNewMessage || unreadChanged) await refreshLatestMessages();
             latestId = data.latest_id;
         } catch (error) {
             // Нет сети — не страшно, попробуем в следующий раз.

@@ -1,0 +1,11 @@
+{% load unfold %}
+{% comment %}
+    Таблица «Новые сообщения» на «Сводке».
+    Подключается в admin/index.html и отдаётся отдельно по адресу
+    …/feedbackmessage/latest/ — для автообновления без перезагрузки.
+{% endcomment %}
+{% if latest_messages.rows %}
+    {% component "unfold/components/table.html" with table=latest_messages card_included=1 %}{% endcomponent %}
+{% else %}
+    {% component "unfold/components/text.html" %}Непрочитанных сообщений нет.{% endcomponent %}
+{% endif %}
