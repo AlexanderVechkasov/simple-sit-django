@@ -1,10 +1,12 @@
 """Страницы обратной связи."""
 
 import hashlib
+
 from django.core.cache import cache
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.vary import vary_on_headers
+
 from .forms import FeedbackForm
 
 # Ограничение частоты: не больше 3 сообщений за 10 минут с одного адреса.

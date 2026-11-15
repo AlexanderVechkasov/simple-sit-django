@@ -1,6 +1,7 @@
 """Адреса приложения timeline."""
 
 from django.urls import path
+
 from . import views
 
 # Пространство имён: в шаблонах пишем {% url "timeline:index" %}.

@@ -8,7 +8,9 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.text import Truncator
+
 from .models import FeedbackMessage
+
 
 def latest_messages_table(limit=5):
     """Последние сообщения (и новые, и прочитанные) в формате таблицы Unfold.

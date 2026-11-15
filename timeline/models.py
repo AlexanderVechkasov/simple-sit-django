@@ -5,6 +5,7 @@ from django.utils.html import strip_tags
 
 from .sanitize import clean_html
 
+
 class Event(models.Model):
     """Историческое событие на шкале."""
 
@@ -19,7 +20,10 @@ class Event(models.Model):
         "ключ из старого сайта",
         max_length=10,
         unique=True,
-        help_text="Например, 1914a или 1735b. По нему импорт находит событие и не создаёт дубликатов.",
+        help_text=(
+            "Например, 1914a или 1735b. "
+            "По нему импорт находит событие и не создаёт дубликатов."
+        ),
     )
     slug = models.SlugField(
         "адрес страницы",
@@ -75,9 +79,6 @@ class Event(models.Model):
         """Век по году начала: 1722 → 18, 1801 → 19, 1900 → 19."""
         return (self.start_year - 1) // 100 + 1
 
-    def get_absolute_url(self):
-        """Адрес страницы события: /events/<slug>/."""
-        return reverse("timeline:event_detail", kwargs={"slug": self.slug})
 
     @property
     def years_display(self):
@@ -85,13 +86,6 @@ class Event(models.Model):
         if self.end_year and self.end_year != self.start_year:
             return f"{self.start_year}—{self.end_year}"
         return str(self.start_year)
-
-    def save(self, *args, **kwargs):
-            # Очищаем текст при КАЖДОМ сохранении: из админки, импорта или кода.
-            self.body = clean_html(self.body)
-            # Краткая справка — обычный текст, поэтому теги убираем полностью.
-            self.summary = strip_tags(self.summary).strip()
-            super().save(*args, **kwargs)
 
 
 class EventImage(models.Model):
@@ -107,7 +101,10 @@ class EventImage(models.Model):
     caption = models.CharField(
         "подпись",
         max_length=255,
-        help_text="Показывается в галерее и служит альтернативным текстом (alt) для незрячих пользователей.",
+        help_text=(
+            "Показывается в галерее и служит альтернативным текстом (alt) "
+            "для незрячих пользователей."
+        ),
     )
     source = models.CharField(
         "источник",
@@ -124,3 +121,14 @@ class EventImage(models.Model):
 
     def __str__(self):
         return self.caption
+
+    def save(self, *args, **kwargs):
+        # Очищаем текст при КАЖДОМ сохранении: из админки, импорта или кода.
+        self.body = clean_html(self.body)
+        # Краткая справка — обычный текст, поэтому теги убираем полностью.
+        self.summary = strip_tags(self.summary).strip()
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        """Адрес страницы события: /events/<slug>/."""
+        return reverse("timeline:event_detail", kwargs={"slug": self.slug})

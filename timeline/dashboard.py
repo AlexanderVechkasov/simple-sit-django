@@ -1,8 +1,10 @@
 """Сводка на главной странице админки (подключена в UNFOLD["DASHBOARD_CALLBACK"])."""
 
 from django.urls import reverse
+
 from feedback.dashboard import latest_messages_table
 from feedback.models import FeedbackMessage
+
 from .models import Event
 
 ROMAN = {17: "XVII", 18: "XVIII", 19: "XIX", 20: "XX", 21: "XXI"}

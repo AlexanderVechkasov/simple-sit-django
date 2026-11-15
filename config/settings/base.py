@@ -4,6 +4,7 @@
 """
 
 from pathlib import Path
+
 import environ
 from django.templatetags.static import static
 from django.urls import reverse_lazy
@@ -169,7 +170,11 @@ UNFOLD = {
                         # Число непрочитанных — функция в feedback/admin.py
                         "badge": "feedback.admin.unread_badge",
                         # Адрес, который admin-live.js опрашивает раз в 20 секунд
-                        "link_attrs": {"data-status-url": reverse_lazy("admin:feedback_feedbackmessage_status")},
+                        "link_attrs": {
+                            "data-status-url": reverse_lazy(
+                                "admin:feedback_feedbackmessage_status"
+                            ),
+                        },
                     },
                 ],
             },

@@ -10,3 +10,23 @@ dependencies = [
     "pillow>=13.0.0",
     "whitenoise>=6.12.0",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.5",
+]
+
+# --- Ruff: проверка кода (uv run ruff check .) ---
+[tool.ruff]
+line-length = 100                    # максимальная длина строки
+extend-exclude = ["*/migrations/*"]  # миграции Django создаёт сам — их не трогаем
+
+[tool.ruff.lint]
+select = [
+    "E", "W",  # стиль кода (PEP 8)
+    "F",       # ошибки: неиспользуемые импорты и переменные, опечатки в именах
+    "I",       # порядок импортов
+    "B",       # частые ловушки и баги
+    "UP",      # устаревшие способы записи для нашей версии Python
+    "DJ",      # правила для Django
+]

@@ -1,6 +1,7 @@
 """Чтение сообщений обратной связи в админке."""
 
 from urllib.parse import quote
+
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseBadRequest, HttpResponseNotAllowed, JsonResponse
@@ -10,6 +11,7 @@ from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.text import Truncator
 from unfold.admin import ModelAdmin
+
 from .dashboard import latest_messages_table
 from .models import FeedbackMessage
 

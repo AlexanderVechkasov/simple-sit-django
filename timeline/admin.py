@@ -8,7 +8,9 @@ from django.utils.html import format_html
 from unfold.admin import ModelAdmin, TabularInline
 from unfold.decorators import display
 from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
+
 from .models import Event, EventImage
+
 
 class CenturyFilter(admin.SimpleListFilter):
     """Фильтр справа в списке: события по векам (по году начала)."""

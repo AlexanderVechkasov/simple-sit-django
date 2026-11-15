@@ -1,7 +1,9 @@
 """Форма обратной связи."""
 
 from django import forms
+
 from .models import FeedbackMessage
+
 
 class FeedbackForm(forms.ModelForm):
     """Почта и текст сообщения. Проверки длины и формата почты Django
