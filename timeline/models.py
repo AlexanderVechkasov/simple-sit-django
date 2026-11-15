@@ -74,6 +74,17 @@ class Event(models.Model):
     def __str__(self):
         return f"{self.years_display} — {self.title}"
 
+    def save(self, *args, **kwargs):
+        # Очищаем текст при КАЖДОМ сохранении: из админки, импорта или кода.
+        self.body = clean_html(self.body)
+        # Краткая справка — обычный текст, поэтому теги убираем полностью.
+        self.summary = strip_tags(self.summary).strip()
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        """Адрес страницы события: /events/<slug>/."""
+        return reverse("timeline:event_detail", kwargs={"slug": self.slug})
+
     @property
     def century(self):
         """Век по году начала: 1722 → 18, 1801 → 19, 1900 → 19."""
@@ -121,14 +132,3 @@ class EventImage(models.Model):
 
     def __str__(self):
         return self.caption
-
-    def save(self, *args, **kwargs):
-        # Очищаем текст при КАЖДОМ сохранении: из админки, импорта или кода.
-        self.body = clean_html(self.body)
-        # Краткая справка — обычный текст, поэтому теги убираем полностью.
-        self.summary = strip_tags(self.summary).strip()
-        super().save(*args, **kwargs)
-
-    def get_absolute_url(self):
-        """Адрес страницы события: /events/<slug>/."""
-        return reverse("timeline:event_detail", kwargs={"slug": self.slug})

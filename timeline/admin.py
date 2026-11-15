@@ -63,7 +63,9 @@ class EventImageInline(TabularInline):
 
     @admin.display(description="превью")
     def preview(self, obj):
-        if obj.image:
+        # obj.pk есть только у сохранённой картинки. Если форма вернулась
+        # с ошибкой, файл ещё не загружен, и показывать по его адресу нечего.
+        if obj.pk and obj.image:
             # format_html безопасно подставляет значения в HTML.
             return format_html('<img src="{}" alt="" class="admin-thumb">', obj.image.url)
         return "—"
