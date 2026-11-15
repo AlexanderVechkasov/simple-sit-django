@@ -46,11 +46,11 @@ def dashboard_callback(request, context):
             "value": unread.count(),
             "note": "Обратная связь с сайта",
             "icon": "mail",
-            "url": f"{messages_url}?is_read__exact=0",
+            "url": messages_url,
             "live": True,
         },
     ]
 
-    # Таблица «Новые сообщения» (её же отдаёт автообновление «Сводки»)
+    # Таблица «Последние сообщения» (её же отдаёт автообновление «Сводки»)
     context["latest_messages"] = latest_messages_table()
     return context

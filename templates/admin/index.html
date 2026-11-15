@@ -24,7 +24,7 @@
                 {% endfor %}
             </div>
 
-            {% component "unfold/components/card.html" with title="Новые сообщения" %}
+            {% component "unfold/components/card.html" with title="Последние сообщения" %}
                 {# Содержимое обновляется само, когда приходит сообщение (static/js/admin-live.js) #}
                 <div data-latest-messages data-url="{% url 'admin:feedback_feedbackmessage_latest' %}">
                     {% include "admin/includes/latest_messages.html" %}

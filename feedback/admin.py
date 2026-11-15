@@ -140,7 +140,7 @@ class FeedbackMessageAdmin(ModelAdmin):
         })
 
     def latest_view(self, request):
-        """Свежая таблица «Новые сообщения» для «Сводки» — готовым HTML.
+        """Свежая таблица «Последние сообщения» для «Сводки» — готовым HTML.
 
         Её запрашивает static/js/admin-live.js, когда меняется число непрочитанных.
         """
