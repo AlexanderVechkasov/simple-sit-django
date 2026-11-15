@@ -49,6 +49,7 @@
             root.dataset.theme = next;
             try {
                 localStorage.setItem(STORAGE_KEY, next);
+                localStorage.setItem('adminTheme', JSON.stringify(next));
             } catch (error) {
                 // не запомнили — не страшно, тема всё равно переключилась
             }
