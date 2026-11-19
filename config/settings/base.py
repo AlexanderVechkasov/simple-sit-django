@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "timeline",
     "feedback",
+    # Удаляет файлы картинок с диска вместе с записью и при замене картинки.
+    "django_cleanup.apps.CleanupConfig",
 ]
 
 MIDDLEWARE = [
