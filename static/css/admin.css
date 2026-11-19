@@ -45,6 +45,9 @@
 }
 
 .message-dialog {
+    position: fixed;
+    inset: 0;
+    translate: none;
     width: min(100% - 2rem, 36rem);
     max-height: calc(100vh - 2rem);
     margin: auto;
