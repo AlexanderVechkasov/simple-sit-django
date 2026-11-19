@@ -26,7 +26,7 @@ def timeline(request):
             "roman": ROMAN_CENTURIES.get(number, str(number)),
             "events": by_century[number],
         }
-        for number in sorted(by_century)
+        for number in sorted(by_century, reverse=True)
     ]
 
     context = {
@@ -44,7 +44,11 @@ def event_detail(request, slug):
 
     # Соседние события на шкале — для ссылок «Предыдущее» и «Следующее».
     # Берём только нужные поля: адрес, заголовок и годы.
-    all_events = list(Event.objects.only("slug", "title", "start_year", "end_year"))
+    all_events = list(
+        Event.objects.order_by("start_year", "order", "pk").only(
+            "slug", "title", "start_year", "end_year"
+        )
+    )
     position = next(i for i, item in enumerate(all_events) if item.pk == event.pk)
     previous_event = all_events[position - 1] if position > 0 else None
     next_event = all_events[position + 1] if position + 1 < len(all_events) else None

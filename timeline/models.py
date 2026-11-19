@@ -56,13 +56,16 @@ class Event(models.Model):
     order = models.PositiveIntegerField(
         "порядок",
         default=0,
-        help_text="Чем меньше число, тем выше событие на шкале.",
+        help_text=(
+            "Нужен только для событий одного года: чем меньше число, тем выше. "
+            "По годам события сортируются сами."
+        ),
     )
     created_at = models.DateTimeField("создано", auto_now_add=True)
     updated_at = models.DateTimeField("изменено", auto_now=True)
 
     class Meta:
-        ordering = ["order", "start_year", "key"]
+        ordering = ["-start_year", "order", "pk"]
         verbose_name = "событие"
         verbose_name_plural = "события"
         constraints = [
