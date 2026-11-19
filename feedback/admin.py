@@ -45,7 +45,7 @@ class FeedbackMessageAdmin(ModelAdmin):
 
     class Media:
         # Панель кнопок «Прочитано / Не прочитано / Удалить» над списком
-        js = ["js/admin-message-toolbar.js"]
+        js = ["js/admin-list-toolbar.js"]
 
     @admin.display(description="сообщение")
     def short_message(self, obj):

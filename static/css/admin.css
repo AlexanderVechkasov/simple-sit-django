@@ -283,8 +283,8 @@ tr:has(.message-link) {
     color: var(--color-primary-300);
 }
 
-/* Панель кнопок над списком сообщений (как в почте) */
-.message-toolbar {
+/* Панель кнопок над списком записей (как в почте) */
+.list-toolbar {
     display: flex;
     flex-basis: 100%;
     flex-wrap: wrap;
@@ -292,11 +292,11 @@ tr:has(.message-link) {
     gap: 8px;
 }
 
-.message-toolbar[hidden] {
+.list-toolbar[hidden] {
     display: none;
 }
 
-.message-tool {
+.list-tool {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -310,49 +310,49 @@ tr:has(.message-link) {
     cursor: pointer;
 }
 
-.message-tool .material-symbols-outlined {
+.list-tool .material-symbols-outlined {
     font-size: 18px;
 }
 
-.message-tool:hover:not(:disabled) {
+.list-tool:hover:not(:disabled) {
     border-color: var(--color-primary-600);
     color: var(--color-primary-600);
 }
 
-.message-tool.danger:hover:not(:disabled) {
+.list-tool.danger:hover:not(:disabled) {
     border-color: #dc2626;
     color: #dc2626;
 }
 
-.message-tool:disabled {
+.list-tool:disabled {
     opacity: 0.45;
     cursor: default;
 }
 
-.dark .message-tool {
+.dark .list-tool {
     border-color: var(--color-base-700);
     background-color: var(--color-base-900);
     color: var(--color-base-200);
 }
 
-.dark .message-tool:hover:not(:disabled) {
+.dark .list-tool:hover:not(:disabled) {
     border-color: var(--color-primary-400);
     color: var(--color-primary-300);
 }
 
-.dark .message-tool.danger:hover:not(:disabled) {
+.dark .list-tool.danger:hover:not(:disabled) {
     border-color: #f87171;
     color: #f87171;
 }
 
-.message-toolbar-status {
+.list-toolbar-status {
     margin-inline-start: 4px;
     color: var(--color-base-500);
     font-size: 14px;
 }
 
 /* Наша панель заменяет стандартную нижнюю панель действий Unfold */
-.message-toolbar-ready div:has(> #changelist-actions-wrapper) {
+.list-toolbar-ready div:has(> #changelist-actions-wrapper) {
     display: none !important;
 }
 

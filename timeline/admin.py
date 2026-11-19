@@ -78,6 +78,11 @@ class EventAdmin(ModelAdmin):
     list_display_links = ["thumbnail", "years", "title"]
     # Порядок можно менять прямо в списке, не открывая событие.
     list_editable = ["order"]
+
+    class Media:
+        # Панель кнопок «Изменить / Удалить» над списком
+        js = ["js/admin-list-toolbar.js"]
+
     list_filter = [CenturyFilter, "outcome", HasImageFilter]
     search_fields = ["title", "summary", "region", "key"]
     list_per_page = 30

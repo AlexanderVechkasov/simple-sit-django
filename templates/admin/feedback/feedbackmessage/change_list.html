@@ -3,28 +3,28 @@
 {% comment %}
     Список сообщений: под поиском — панель кнопок, как в почте
     («Прочитано», «Не прочитано», «Удалить»). Кнопки оживляет
-    static/js/admin-message-toolbar.js. Без JavaScript панель скрыта,
-    и работает обычное меню действий Django.
+    static/js/admin-list-toolbar.js. Без JavaScript панель скрыта,
+    и работает обычная панель действий Django/Unfold.
 {% endcomment %}
 
 {% block filters %}
     {{ block.super }}
 
-    <div class="message-toolbar" role="group" aria-label="Действия с выбранными сообщениями"
-         data-message-toolbar data-bulk-url="{% url 'admin:feedback_feedbackmessage_bulk' %}" hidden>
+    <div class="list-toolbar" role="group" aria-label="Действия с выбранными сообщениями"
+         data-list-toolbar data-bulk-url="{% url 'admin:feedback_feedbackmessage_bulk' %}" hidden>
         {% if can_change %}
-            <button type="button" class="message-tool" data-bulk="read" disabled>
+            <button type="button" class="list-tool" data-tool="read" disabled>
                 <span class="material-symbols-outlined" aria-hidden="true">drafts</span>Прочитано
             </button>
-            <button type="button" class="message-tool" data-bulk="unread" disabled>
+            <button type="button" class="list-tool" data-tool="unread" disabled>
                 <span class="material-symbols-outlined" aria-hidden="true">mark_email_unread</span>Не прочитано
             </button>
         {% endif %}
         {% if can_delete %}
-            <button type="button" class="message-tool danger" data-bulk="delete" disabled>
+            <button type="button" class="list-tool danger" data-tool="delete" disabled>
                 <span class="material-symbols-outlined" aria-hidden="true">delete</span>Удалить
             </button>
         {% endif %}
-        <span class="message-toolbar-status" role="status">Отметьте сообщения галочками</span>
+        <span class="list-toolbar-status" role="status">Отметьте записи галочками</span>
     </div>
 {% endblock %}

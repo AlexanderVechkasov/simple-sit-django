@@ -1,0 +1,28 @@
+{% extends "admin/change_list.html" %}
+
+{% comment %}
+    Список событий: под поиском — панель кнопок, как в «Сообщениях»
+    («Изменить», «Удалить»). Кнопки оживляет static/js/admin-list-toolbar.js.
+    Без JavaScript панель скрыта, и работает обычная панель действий Django/Unfold.
+
+    perms — права вошедшего пользователя; Django сам кладёт их в каждый шаблон.
+{% endcomment %}
+
+{% block filters %}
+    {{ block.super }}
+
+    <div class="list-toolbar" role="group" aria-label="Действия с выбранными событиями"
+         data-list-toolbar hidden>
+        {% if perms.timeline.change_event %}
+            <button type="button" class="list-tool" data-tool="edit" data-needs="one" disabled>
+                <span class="material-symbols-outlined" aria-hidden="true">edit</span>Изменить
+            </button>
+        {% endif %}
+        {% if perms.timeline.delete_event %}
+            <button type="button" class="list-tool danger" data-tool="delete" disabled>
+                <span class="material-symbols-outlined" aria-hidden="true">delete</span>Удалить
+            </button>
+        {% endif %}
+        <span class="list-toolbar-status" role="status">Отметьте записи галочками</span>
+    </div>
+{% endblock %}

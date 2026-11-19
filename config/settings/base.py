@@ -127,6 +127,7 @@ UNFOLD = {
         lambda request: static("js/admin-live.js"),
         lambda request: static("js/admin-messages.js"),
         lambda request: static("js/admin-theme-sync.js"),
+        lambda request: static("js/admin-delete-confirm.js"),
     ],
     # Основной цвет — тёмно-синий, как на сайте. Оттенки от светлого (50)
     # до тёмного (950) в формате oklch; Unfold сам выбирает нужные.
