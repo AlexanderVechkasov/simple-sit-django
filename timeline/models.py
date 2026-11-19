@@ -1,4 +1,5 @@
 """Модели исторической шкалы: события и их изображения."""
+
 from django.db import models
 from django.urls import reverse
 from django.utils.html import strip_tags
@@ -21,8 +22,7 @@ class Event(models.Model):
         max_length=10,
         unique=True,
         help_text=(
-            "Например, 1914a или 1735b. "
-            "По нему импорт находит событие и не создаёт дубликатов."
+            "Например, 1914a или 1735b. По нему импорт находит событие и не создаёт дубликатов."
         ),
     )
     slug = models.SlugField(
@@ -89,7 +89,6 @@ class Event(models.Model):
     def century(self):
         """Век по году начала: 1722 → 18, 1801 → 19, 1900 → 19."""
         return (self.start_year - 1) // 100 + 1
-
 
     @property
     def years_display(self):

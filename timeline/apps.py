@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class TimelineConfig(AppConfig):
-    name = 'timeline'
+    name = "timeline"
     verbose_name = "Историческая шкала"

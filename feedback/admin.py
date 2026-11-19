@@ -122,10 +122,12 @@ class FeedbackMessageAdmin(ModelAdmin):
         ids = [int(pk) for pk in request.POST.getlist("ids") if pk.isdigit()]
 
         changed = FeedbackMessage.objects.filter(pk__in=ids).update(is_read=(action == "read"))
-        return JsonResponse({
-            "changed": changed,
-            "unread": FeedbackMessage.objects.filter(is_read=False).count(),
-        })
+        return JsonResponse(
+            {
+                "changed": changed,
+                "unread": FeedbackMessage.objects.filter(is_read=False).count(),
+            }
+        )
 
     def status_view(self, request):
         """Сводка для «живого» обновления: сколько непрочитанных и какое последнее.
@@ -135,11 +137,13 @@ class FeedbackMessageAdmin(ModelAdmin):
         if not self.has_view_permission(request):
             raise PermissionDenied
         latest = FeedbackMessage.objects.order_by("-pk").first()
-        return JsonResponse({
-            "unread": FeedbackMessage.objects.filter(is_read=False).count(),
-            "latest_id": latest.pk if latest else 0,
-            "latest_email": latest.email if latest else "",
-        })
+        return JsonResponse(
+            {
+                "unread": FeedbackMessage.objects.filter(is_read=False).count(),
+                "latest_id": latest.pk if latest else 0,
+                "latest_email": latest.email if latest else "",
+            }
+        )
 
     def latest_view(self, request):
         """Свежая таблица «Последние сообщения» для «Сводки» — готовым HTML.
@@ -169,15 +173,17 @@ class FeedbackMessageAdmin(ModelAdmin):
             message.save(update_fields=["is_read"])
 
         received = timezone.localtime(message.created_at)
-        return JsonResponse({
-            "email": message.email,
-            "received": f"{received:%d.%m.%Y %H:%M}",
-            "message": message.message,
-            "was_unread": was_unread,
-            "unread": FeedbackMessage.objects.filter(is_read=False).count(),
-            "reply_url": f"mailto:{message.email}?subject={quote(REPLY_SUBJECT)}",
-            "change_url": reverse("admin:feedback_feedbackmessage_change", args=[message.pk]),
-        })
+        return JsonResponse(
+            {
+                "email": message.email,
+                "received": f"{received:%d.%m.%Y %H:%M}",
+                "message": message.message,
+                "was_unread": was_unread,
+                "unread": FeedbackMessage.objects.filter(is_read=False).count(),
+                "reply_url": f"mailto:{message.email}?subject={quote(REPLY_SUBJECT)}",
+                "change_url": reverse("admin:feedback_feedbackmessage_change", args=[message.pk]),
+            }
+        )
 
     def has_add_permission(self, request):
         # Сообщения приходят только с сайта, вручную их не создаём.

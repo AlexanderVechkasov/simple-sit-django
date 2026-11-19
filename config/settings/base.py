@@ -114,14 +114,14 @@ UNFOLD = {
     "SITE_HEADER": "Историческая шкала",
     "SITE_SUBHEADER": "Панель управления",
     "SITE_SYMBOL": "history_edu",  # значок из набора Material Symbols
-# Страница входа: справа случайная картина из событий шкалы
+    # Страница входа: справа случайная картина из событий шкалы
     "LOGIN": {"image": "timeline.login.random_login_image"},
     "SITE_URL": "/",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
-# Данные для «Сводки» на главной странице админки
+    # Данные для «Сводки» на главной странице админки
     "DASHBOARD_CALLBACK": "timeline.dashboard.dashboard_callback",
-# Наш CSS поверх оформления Unfold
+    # Наш CSS поверх оформления Unfold
     "STYLES": [lambda request: static("css/admin.css")],
     "SCRIPTS": [
         lambda request: static("js/admin-live.js"),

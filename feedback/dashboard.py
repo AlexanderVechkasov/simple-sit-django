@@ -27,17 +27,19 @@ def latest_messages_table(limit=5):
             status = format_html('<span class="message-status">{}</span>', "Прочитано")
         else:
             status = format_html('<span class="message-status is-unread">{}</span>', "Новое")
-        rows.append([
-            f"{timezone.localtime(message.created_at):%d.%m.%Y %H:%M}",
-            message.email,
-            format_html(
-                '<a href="{}" class="message-link" data-url="{}">{}</a>',
-                change_url,
-                read_url,
-                Truncator(message.message).chars(70),
-            ),
-            status,
-        ])
+        rows.append(
+            [
+                f"{timezone.localtime(message.created_at):%d.%m.%Y %H:%M}",
+                message.email,
+                format_html(
+                    '<a href="{}" class="message-link" data-url="{}">{}</a>',
+                    change_url,
+                    read_url,
+                    Truncator(message.message).chars(70),
+                ),
+                status,
+            ]
+        )
     return {
         "headers": ["Получено", "Почта", "Сообщение", "Статус"],
         "rows": rows,

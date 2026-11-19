@@ -21,9 +21,7 @@ def dashboard_callback(request, context):
     for year in Event.objects.values_list("start_year", flat=True):
         century = (year - 1) // 100 + 1
         by_century[century] = by_century.get(century, 0) + 1
-    centuries = " · ".join(
-        f"{ROMAN.get(c, c)} — {n}" for c, n in sorted(by_century.items())
-    )
+    centuries = " · ".join(f"{ROMAN.get(c, c)} — {n}" for c, n in sorted(by_century.items()))
 
     without_images = Event.objects.filter(images__isnull=True).count()
     unread = FeedbackMessage.objects.filter(is_read=False)

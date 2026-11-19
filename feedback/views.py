@@ -13,6 +13,7 @@ from .forms import FeedbackForm
 RATE_LIMIT = 3
 RATE_WINDOW = 10 * 60  # в секундах
 
+
 def rate_limit_key(request):
     """Ключ счётчика для этого посетителя.
 
@@ -25,13 +26,16 @@ def rate_limit_key(request):
     digest = hashlib.sha256(ip.encode()).hexdigest()[:32]
     return f"feedback:sent:{digest}"
 
+
 def too_many_messages(request):
     return cache.get(rate_limit_key(request), 0) >= RATE_LIMIT
+
 
 def count_message(request):
     key = rate_limit_key(request)
     cache.add(key, 0, RATE_WINDOW)  # создаёт счётчик на 10 минут, если его ещё нет
-    cache.incr(key)                       # +1 к счётчику
+    cache.incr(key)  # +1 к счётчику
+
 
 def is_from_dialog(request):
     """Запрос пришёл из окна «Написать нам» (наш JS ставит этот заголовок)."""
@@ -74,6 +78,7 @@ def feedback(request):
     # (с ошибками и уже введённым текстом, если они есть).
     template = "feedback/form.html" if from_dialog else "feedback/feedback.html"
     return render(request, template, {"form": form})
+
 
 def thanks(request):
     """Страница «Спасибо, сообщение отправлено»."""

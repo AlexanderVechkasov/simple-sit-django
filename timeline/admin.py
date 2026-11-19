@@ -89,18 +89,27 @@ class EventAdmin(ModelAdmin):
 
     # Поля события разложены по вкладкам (classes: ["tab"] — возможность Unfold).
     fieldsets = [
-        ("Основное", {
-            "classes": ["tab"],
-            "fields": ["title", ("start_year", "end_year"), "region", "outcome"],
-        }),
-        ("Тексты", {
-            "classes": ["tab"],
-            "fields": ["summary", "body"],
-        }),
-        ("Адрес и порядок", {
-            "classes": ["tab"],
-            "fields": ["slug", "key", "order", ("created_at", "updated_at")],
-        }),
+        (
+            "Основное",
+            {
+                "classes": ["tab"],
+                "fields": ["title", ("start_year", "end_year"), "region", "outcome"],
+            },
+        ),
+        (
+            "Тексты",
+            {
+                "classes": ["tab"],
+                "fields": ["summary", "body"],
+            },
+        ),
+        (
+            "Адрес и порядок",
+            {
+                "classes": ["tab"],
+                "fields": ["slug", "key", "order", ("created_at", "updated_at")],
+            },
+        ),
     ]
 
     def get_queryset(self, request):
