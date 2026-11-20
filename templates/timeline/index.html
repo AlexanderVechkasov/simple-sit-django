@@ -28,10 +28,10 @@
 
                 <ol class="event-list">
                     {% for event in century.events %}
-                        <li class="event" id="event-{{ event.key }}">
+                        <li class="event" id="event-{{ event.slug }}">
                             <h3 class="event-heading">
                                 <button type="button" class="event-toggle"
-                                        aria-expanded="false" aria-controls="description-{{ event.key }}">
+                                        aria-expanded="false" aria-controls="description-{{ event.slug }}">
                                     <span class="event-years">{{ event.years_display }}</span>
                                     <span class="event-title">{{ event.title }}</span>
                                     {% if event.outcome %}
@@ -48,12 +48,12 @@
                                 </button>
                             </h3>
 
-                            <div class="event-body" id="description-{{ event.key }}" hidden>
+                            <div class="event-body" id="description-{{ event.slug }}" hidden>
                                 {% if event.images.all %}
                                     <div class="event-images">
                                         {% for image in event.images.all %}
                                             <a href="{{ image.image.url }}" class="gallery-link"
-                                               data-gallery="{{ event.key }}" data-caption="{{ image.caption }}">
+                                               data-gallery="{{ event.slug }}" data-caption="{{ image.caption }}">
                                                 <img src="{{ image.image.url }}" alt="{{ image.caption }}" loading="lazy">
                                             </a>
                                         {% endfor %}

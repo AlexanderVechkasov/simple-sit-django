@@ -6,7 +6,7 @@
 {% block content %}
 <main id="main" class="article-page">
     <p class="article-back">
-        <a class="back-link" href="{% url 'timeline:index' %}#event-{{ event.key }}">
+        <a class="back-link" href="{% url 'timeline:index' %}#event-{{ event.slug }}">
             <span aria-hidden="true">←</span> Вся шкала
         </a>
     </p>
