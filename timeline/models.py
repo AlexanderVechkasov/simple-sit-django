@@ -4,6 +4,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.html import strip_tags
 
+from .images import shrink_image
 from .sanitize import clean_html
 
 
@@ -18,7 +19,8 @@ class Event(models.Model):
         UNDETERMINED = "undetermined", "Неопределённый"
 
     key = models.CharField(
-        "ключ из старого сайта",        max_length=10,
+        "ключ из старого сайта",
+        max_length=10,
         unique=True,
         # Ключ есть только у событий, перенесённых со старого сайта.
         blank=True,
@@ -137,3 +139,12 @@ class EventImage(models.Model):
 
     def __str__(self):
         return self.caption
+
+    def save(self, *args, **kwargs):
+        # Новая картинка (ещё не записана на диск): если она слишком большая
+        # или тяжёлая — уменьшаем и сохраняем в JPEG. Иначе оставляем как есть.
+        if self.image and not self.image._committed:
+            smaller = shrink_image(self.image)
+            if smaller:
+                self.image = smaller
+        super().save(*args, **kwargs)
