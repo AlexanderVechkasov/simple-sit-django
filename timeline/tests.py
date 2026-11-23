@@ -367,6 +367,21 @@ class TimelineAdminAndHelpersTests(TestCase):
             self.assertContains(without_img, self.e1722.title)
             self.assertNotContains(without_img, self.e1812.title)
 
+    def test_admin_changelist_search_handles_cyrillic_and_key(self):
+        self.e1722.key = "1722a"
+        self.e1722.save(update_fields=["key"])
+
+        self.client.force_login(self.superuser)
+        changelist_url = reverse("admin:timeline_event_changelist")
+
+        by_title = self.client.get(changelist_url, {"q": "событие xix"})
+        self.assertContains(by_title, self.e1812.title)
+        self.assertNotContains(by_title, self.e1722.title)
+
+        by_key = self.client.get(changelist_url, {"q": "1722a"})
+        self.assertContains(by_key, self.e1722.title)
+        self.assertNotContains(by_key, self.e1812.title)
+
 
 class ImportEventsCommandTests(TestCase):
     def test_import_creates_updates_and_blocks_path_traversal(self):

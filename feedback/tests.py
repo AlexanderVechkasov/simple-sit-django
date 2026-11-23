@@ -324,3 +324,12 @@ class FeedbackAdminAndDashboardTests(TestCase):
 
         self.msg1.refresh_from_db()
         self.assertTrue(self.msg1.is_read)
+
+    def test_admin_changelist_search_handles_cyrillic_case(self):
+        self.client.force_login(self.superuser)
+        url = reverse("admin:feedback_feedbackmessage_changelist")
+
+        response = self.client.get(url, {"q": "ПЕРВОЕ непрочитанное"})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.msg1.email)
+        self.assertNotContains(response, self.msg2.email)

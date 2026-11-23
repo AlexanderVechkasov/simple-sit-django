@@ -12,6 +12,8 @@ from django.utils.html import format_html
 from django.utils.text import Truncator
 from unfold.admin import ModelAdmin
 
+from timeline.search import normalize_text
+
 from .dashboard import latest_messages_table
 from .models import FeedbackMessage
 
@@ -31,6 +33,7 @@ class FeedbackMessageAdmin(ModelAdmin):
     list_display_links = None
     list_filter = ["is_read", "created_at"]
     search_fields = ["email", "message"]
+    search_help_text = "Поиск по почте или тексту сообщения"
     date_hierarchy = "created_at"
 
     fields = ["created_at", "email", "message", "is_read"]
@@ -91,6 +94,18 @@ class FeedbackMessageAdmin(ModelAdmin):
             "can_delete": self.has_delete_permission(request),
         }
         return super().changelist_view(request, extra_context)
+
+    def get_search_results(self, request, queryset, search_term):
+        # SQLite не поддерживает регистронезависимый LIKE для кириллицы.
+        tokens = normalize_text(search_term).split()
+        if not tokens:
+            return queryset, False
+        matched_ids = [
+            msg.pk
+            for msg in queryset.only("pk", "email", "message")
+            if all(token in normalize_text(f"{msg.email} {msg.message}") for token in tokens)
+        ]
+        return queryset.filter(pk__in=matched_ids), False
 
     def bulk_view(self, request):
         """Массово отметить выбранные сообщения прочитанными или непрочитанными."""

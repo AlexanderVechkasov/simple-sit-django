@@ -10,24 +10,22 @@ def normalize_text(text: str) -> str:
     return text.casefold().replace("ё", "е")
 
 
-def _event_fields(event: Event) -> tuple[str, str]:
+def _event_fields(event: Event, *, include_internal: bool = False) -> tuple[str, str]:
     primary = normalize_text(
         f"{event.years_display} {event.start_year} {event.end_year or ''} {event.title}"
     )
-    secondary = normalize_text(
-        " ".join(
-            [
-                event.region,
-                event.get_outcome_display(),
-                event.summary,
-                strip_tags(event.body),
-            ]
-        )
-    )
-    return primary, secondary
+    parts = [
+        event.region,
+        event.get_outcome_display(),
+        event.summary,
+        strip_tags(event.body),
+    ]
+    if include_internal:
+        parts.extend([event.key or "", event.slug])
+    return primary, normalize_text(" ".join(parts))
 
 
-def search_events(query: str, queryset=None) -> list[Event]:
+def search_events(query: str, queryset=None, *, include_internal: bool = False) -> list[Event]:
     """Найти события, содержащие все слова запроса (без учёта регистра и ё/е).
 
     Совпадения в годах и заголовке поднимаются выше совпадений только в описании.
@@ -41,7 +39,7 @@ def search_events(query: str, queryset=None) -> list[Event]:
     secondary_matches = []
 
     for event in events:
-        primary, secondary = _event_fields(event)
+        primary, secondary = _event_fields(event, include_internal=include_internal)
         combined = f"{primary} {secondary}"
         if not all(token in combined for token in tokens):
             continue

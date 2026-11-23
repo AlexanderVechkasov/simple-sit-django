@@ -10,6 +10,7 @@ from unfold.decorators import display
 from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
 
 from .models import Event, EventImage
+from .search import search_events
 
 
 class CenturyFilter(admin.SimpleListFilter):
@@ -76,7 +77,8 @@ class EventAdmin(ModelAdmin):
         js = ["js/admin-list-toolbar.js"]
 
     list_filter = [CenturyFilter, "outcome", HasImageFilter]
-    search_fields = ["title", "summary", "region", "key"]
+    search_fields = ["title", "summary", "body", "region", "key", "start_year", "end_year"]
+    search_help_text = "Поиск по году, названию, региону, ключу или тексту статьи"
     list_per_page = 30
 
     prepopulated_fields = {"slug": ["start_year", "title"]}
@@ -109,6 +111,17 @@ class EventAdmin(ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related("images")
+
+    def get_search_results(self, request, queryset, search_term):
+        # SQLite не поддерживает регистронезависимый LIKE для кириллицы,
+        # поэтому фильтруем через общий поиск с casefold и ё → е.
+        if not search_term.strip():
+            return queryset, False
+        matched_ids = [
+            event.pk
+            for event in search_events(search_term, queryset=queryset, include_internal=True)
+        ]
+        return queryset.filter(pk__in=matched_ids), False
 
     @admin.display(description="годы", ordering="start_year")
     def years(self, obj):
