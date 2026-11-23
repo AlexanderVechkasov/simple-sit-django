@@ -4,7 +4,12 @@ from .base import *  # noqa: F403
 
 DEBUG = False
 
-DATABASES = {"default": env.db("DATABASE_URL")}  # noqa: F405
+DATABASES = {
+    "default": env.db(  # noqa: F405
+        "DATABASE_URL",
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",  # noqa: F405
+    )
+}
 
 # За обратным прокси (PythonAnywhere / nginx) доверяем заголовкам прокси и схеме HTTPS.
 TRUST_PROXY_HEADERS = env.bool("TRUST_PROXY_HEADERS", default=True)  # noqa: F405
