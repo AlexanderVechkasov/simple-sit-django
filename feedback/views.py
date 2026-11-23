@@ -2,6 +2,7 @@
 
 import hashlib
 
+from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
@@ -13,10 +14,21 @@ RATE_LIMIT = 3
 RATE_WINDOW = 10 * 60
 
 
+def client_ip(request):
+    """Определить IP посетителя с учётом обратного прокси, если он доверенный."""
+    if getattr(settings, "TRUST_PROXY_HEADERS", False):
+        real_ip = request.META.get("HTTP_X_REAL_IP", "").strip()
+        if real_ip:
+            return real_ip
+        forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
+        if forwarded:
+            return forwarded.split(",")[0].strip()
+    return request.META.get("REMOTE_ADDR", "")
+
+
 def rate_limit_key(request):
     """Вернуть хеш IP посетителя для временного счётчика rate-limit."""
-    # TODO: на сервере за обратным прокси нужно учитывать X-Forwarded-For.
-    ip = request.META.get("REMOTE_ADDR", "")
+    ip = client_ip(request)
     digest = hashlib.sha256(ip.encode()).hexdigest()[:32]
     return f"feedback:sent:{digest}"
 
@@ -27,8 +39,12 @@ def too_many_messages(request):
 
 def count_message(request):
     key = rate_limit_key(request)
-    cache.add(key, 0, RATE_WINDOW)
-    cache.incr(key)
+    if cache.add(key, 1, RATE_WINDOW):
+        return
+    try:
+        cache.incr(key)
+    except ValueError:
+        cache.set(key, 1, RATE_WINDOW)
 
 
 def is_from_dialog(request):
