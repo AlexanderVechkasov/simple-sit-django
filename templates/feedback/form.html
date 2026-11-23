@@ -1,4 +1,3 @@
-{# Сама форма — отдельным файлом: она же показывается в окне «Написать нам» #}
 <form class="feedback-form" method="post" action="{% url 'feedback:form' %}" novalidate>
     {% csrf_token %}
 
@@ -14,7 +13,6 @@
 
     {% for field in form %}
         {% if field.name == "homepage" %}
-            {# Ловушка для ботов: спрятана и от глаз, и от скринридеров #}
             <div class="hp-field" aria-hidden="true">
                 {{ field.as_field_group }}
             </div>

@@ -1,17 +1,4 @@
-/*
- * Админка: панель кнопок над списком записей, как в почте.
- * Используется в «Сообщениях» и «Событиях» (шаблоны change_list.html этих разделов).
- *
- * Кнопки панели (атрибут data-tool):
- *   read / unread — отметить сообщения прочитанными или нет, без перезагрузки
- *                   (наш адрес из data-bulk-url, только в «Сообщениях»);
- *   edit          — открыть отмеченную запись для изменения (нужна ровно одна);
- *   delete        — удалить отмеченные: спрашиваем в окне (askDelete из
- *                   admin-delete-confirm.js) и запускаем действие Django
- *                   «Удалить выбранные».
- *
- * Без JavaScript панель скрыта, и работает обычная нижняя панель действий Unfold.
- */
+/* Панель массовых действий над списком записей в админке (сообщения и события). */
 document.addEventListener('DOMContentLoaded', () => {
     const toolbar = document.querySelector('[data-list-toolbar]');
     const form = document.getElementById('changelist-form');
@@ -21,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusText = toolbar.querySelector('.list-toolbar-status');
     const tokenInput = form.querySelector('input[name="csrfmiddlewaretoken"]');
 
-    // Показываем нашу панель и прячем стандартную нижнюю панель действий Unfold.
     toolbar.hidden = false;
     document.body.classList.add('list-toolbar-ready');
 
@@ -29,8 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return [...form.querySelectorAll('input.action-select:checked')];
     }
 
-    // Кнопки активны, только когда отмечено подходящее число записей:
-    // «Изменить» (data-needs="one") — ровно одна, остальные — хотя бы одна.
     function updateToolbar(message) {
         const count = checkedBoxes().length;
         buttons.forEach((button) => {
@@ -43,18 +27,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Галочки (и «выбрать все») меняет ещё и скрипт Django, поэтому
-    // пересчитываем после того, как он закончит (setTimeout 0).
+    // Ждём следующий тик, чтобы обработчик action-toggle из Django успел обновить чекбоксы.
     form.addEventListener('change', () => setTimeout(() => updateToolbar()));
 
-    // Снять все галочки — так же, как это сделал бы пользователь.
     function clearSelection() {
         const toggle = document.getElementById('action-toggle');
         if (toggle && toggle.checked) toggle.click();
         checkedBoxes().forEach((box) => box.click());
     }
 
-    // ---- «Прочитано» / «Не прочитано» (только «Сообщения») ----
     async function markSelected(action) {
         const boxes = checkedBoxes();
         const body = new FormData();
@@ -71,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(`Сервер ответил ${response.status}`);
             const data = await response.json();
 
-            // Меняем статус в строках, которые были отмечены.
             boxes.forEach((box) => {
                 const status = box.closest('tr').querySelector('.message-status');
                 if (!status) return;
@@ -82,21 +62,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             clearSelection();
             const done = action === 'read' ? 'прочитанные' : 'непрочитанные';
-            // После пересчёта галочек (он тоже идёт через setTimeout) — наш итог.
+            // Перезаписываем статус после асинхронного пересчёта из change-обработчика.
             setTimeout(() => updateToolbar(`Отмечено как ${done}: ${data.changed}`));
         } catch (error) {
             updateToolbar('Не получилось. Попробуйте обновить страницу.');
         }
     }
 
-    // ---- «Изменить»: переходим по ссылке на запись из её же строки ----
     function editSelected() {
         const [box] = checkedBoxes();
         const link = box && box.closest('tr').querySelector('a[href*="/change/"]');
         if (link) window.location.href = link.href;
     }
 
-    // ---- «Удалить»: окно подтверждения + действие Django «Удалить выбранные» ----
     function deleteSelected(button) {
         const select = form.querySelector('select[name="action"]');
         const runButton = form.querySelector('button[name="index"]');
@@ -109,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             trigger: button,
             confirm: () => {
                 select.value = 'delete_selected';
-                // post=yes — ответ «Да, я уверен» вместо страницы подтверждения Django.
+                // post=yes подтверждает массовое удаление Django без промежуточной страницы.
                 const confirmed = document.createElement('input');
                 confirmed.type = 'hidden';
                 confirmed.name = 'post';

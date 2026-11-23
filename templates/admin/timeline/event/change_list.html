@@ -1,13 +1,5 @@
 {% extends "admin/change_list.html" %}
 
-{% comment %}
-    Список событий: под поиском — панель кнопок, как в «Сообщениях»
-    («Изменить», «Удалить»). Кнопки оживляет static/js/admin-list-toolbar.js.
-    Без JavaScript панель скрыта, и работает обычная панель действий Django/Unfold.
-
-    perms — права вошедшего пользователя; Django сам кладёт их в каждый шаблон.
-{% endcomment %}
-
 {% block filters %}
     {{ block.super }}
 

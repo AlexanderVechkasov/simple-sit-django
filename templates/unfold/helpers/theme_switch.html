@@ -1,9 +1,5 @@
 {% load i18n %}
-{% comment %}
-    Наша версия переключателя темы из Unfold (тот же путь, что в пакете,
-    поэтому Django берёт этот файл вместо оригинального).
-    Только значки, без подписей; подписи — в aria-label и всплывающей подсказке.
-{% endcomment %}
+{# Переопределяет переключатель темы Unfold: компактный вариант только со значками #}
 {% if not theme %}
     <div class="theme-switch border-b border-base-200 flex flex-row gap-1 mb-1 pb-1 px-2 dark:border-base-700"
          role="group" aria-label="Тема оформления">

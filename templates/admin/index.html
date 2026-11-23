@@ -1,11 +1,6 @@
 {% extends "admin/base.html" %}
 {% load i18n unfold %}
 
-{% comment %}
-    Главная страница админки: карточки со сводкой, новые сообщения
-    и последние действия. Данные готовит timeline/dashboard.py.
-{% endcomment %}
-
 {% block title %}{{ title }} | {{ site_title }}{% endblock %}
 
 {% block branding %}
@@ -25,7 +20,7 @@
             </div>
 
             {% component "unfold/components/card.html" with title="Последние сообщения" %}
-                {# Содержимое обновляется само, когда приходит сообщение (static/js/admin-live.js) #}
+                {# Контейнер обновляется из static/js/admin-live.js #}
                 <div data-latest-messages data-url="{% url 'admin:feedback_feedbackmessage_latest' %}">
                     {% include "admin/includes/latest_messages.html" %}
                 </div>

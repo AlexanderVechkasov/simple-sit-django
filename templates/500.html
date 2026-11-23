@@ -8,9 +8,7 @@
     <link rel="stylesheet" href="{% static 'css/site.css' %}">
 </head>
 <body>
-    {# Эта страница специально НЕ наследует base.html: если ошибка   #}
-    {# в общем шаблоне, страница ошибки тоже не должна сломаться.    #}
-    {# Тема здесь только системная: theme.js не подключаем ради простоты. #}
+    {# Не наследует base.html, чтобы страница 500 работала даже при сбое в базовом шаблоне #}
     <header class="site-header">
         <div class="container header-inner">
             <a class="site-logo" href="/">Историческая шкала России</a>

@@ -1,23 +1,18 @@
-/*
- * Наши правки оформления админки (Unfold).
- * Подключается через настройку UNFOLD["STYLES"] в config/settings/base.py.
- */
+/* Переопределения стилей админки Unfold (подключается через UNFOLD["STYLES"]). */
 
-/* Переключатель темы в меню пользователя: значки покрупнее */
 .theme-switch .material-symbols-outlined {
     font-size: 24px;
 }
 
-/* Маленькое превью картинки события в списке и на вкладке «изображения» */
 .admin-thumb {
     width: 64px;
-    max-width: none; /* Unfold по умолчанию сжимает картинки по ширине ячейки */
+    max-width: none; /* Unfold по умолчанию сжимает <img> по ширине ячейки */
     height: 48px;
     object-fit: cover;
     border-radius: 6px;
 }
 
-/* ===== Сообщения: кнопка «Прочитать» и окно просмотра ===== */
+/* ===== Сообщения и модальные окна ===== */
 
 .message-open {
     padding: 4px 12px;
@@ -134,7 +129,7 @@
     background-color: var(--color-base-50);
     font-size: 15px;
     line-height: 1.6;
-    white-space: pre-wrap; /* сохраняем переносы строк из сообщения */
+    white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
 
@@ -174,7 +169,6 @@
     font-size: 18px;
 }
 
-/* Статус сообщения в списке: «Новое» / «Прочитано» */
 .message-status {
     display: inline-block;
     padding: 2px 8px;
@@ -201,13 +195,13 @@
     color: var(--color-primary-200);
 }
 
-/* Вся строка сообщения кликабельна */
 tr:has(.message-open),
 tr:has(.message-link) {
     cursor: pointer;
 }
 
-/* Уведомление о новом сообщении — в правом нижнем углу */
+/* ===== Live-уведомления ===== */
+
 .live-toast {
     position: fixed;
     right: 24px;
@@ -272,7 +266,6 @@ tr:has(.message-link) {
     }
 }
 
-/* Ссылка на сообщение в таблице «Последние сообщения» на «Сводке» */
 .message-link {
     color: var(--color-primary-600);
     font-weight: 500;
@@ -286,7 +279,8 @@ tr:has(.message-link) {
     color: var(--color-primary-300);
 }
 
-/* Панель кнопок над списком записей (как в почте) */
+/* ===== Панель массовых действий ===== */
+
 .list-toolbar {
     display: flex;
     flex-basis: 100%;
@@ -354,12 +348,11 @@ tr:has(.message-link) {
     font-size: 14px;
 }
 
-/* Наша панель заменяет стандартную нижнюю панель действий Unfold */
+/* Скрываем нижнюю панель действий Unfold, когда активна верхняя панель (admin-list-toolbar.js). */
 .list-toolbar-ready div:has(> #changelist-actions-wrapper) {
     display: none !important;
 }
 
-/* Красная кнопка «Удалить» в окне подтверждения */
 .message-dialog-button.danger {
     border-color: #dc2626;
     background-color: #dc2626;
@@ -371,9 +364,8 @@ tr:has(.message-link) {
     background-color: #b91c1c;
 }
 
-/* ---- Страница входа в админку: в стиле сайта ---- */
+/* ===== Страница входа ===== */
 
-/* PT Serif — тот же шрифт заголовков, что на сайте (файлы из static/fonts) */
 @font-face {
     font-family: "PT Serif";
     font-style: normal;
@@ -419,7 +411,6 @@ tr:has(.message-link) {
     color: #ffffff;
 }
 
-/* Цвет фона страницы входа — к нему «растворяется» картина */
 .login #page {
     --login-bg: #ffffff;
 }
@@ -428,14 +419,12 @@ tr:has(.message-link) {
     --login-bg: var(--color-base-900);
 }
 
-/* Картина справа: показываем середину, а не левый верхний угол */
 .login #page > div[style*="background-image"] {
     position: relative;
     background-position: center;
     animation: login-picture-in 1.2s ease-out both;
 }
 
-/* Плавный переход: левый край картины растворяется в фоне формы */
 .login #page > div[style*="background-image"]::before {
     content: "";
     position: absolute;
@@ -449,7 +438,6 @@ tr:has(.message-link) {
     );
 }
 
-/* Форма мягко поднимается снизу при открытии страницы */
 .login #page > div:first-child > div {
     animation: login-form-in 0.6s ease-out both;
 }
@@ -467,7 +455,6 @@ tr:has(.message-link) {
     }
 }
 
-/* Кто отключил анимацию в системе — показываем сразу, без движения */
 @media (prefers-reduced-motion: reduce) {
     .login #page > div[style*="background-image"],
     .login #page > div:first-child > div {

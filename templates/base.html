@@ -7,10 +7,9 @@
     <meta name="description" content="{% block description %}Интерактивная хронология военных конфликтов Российской империи 1722–1918 годов{% endblock %}">
     <meta name="color-scheme" content="light dark">
 
-    {# Тема — первой и без defer, чтобы при загрузке не мелькала не та тема #}
+    {# Без defer: применяем тему до первого рендера, чтобы избежать мелькания (FOUC) #}
     <script src="{% static 'js/theme.js' %}"></script>
 
-    {# Основной шрифт нужен сразу — просим браузер скачать его заранее #}
     <link rel="preload" href="{% static 'fonts/inter-cyrillic-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{% static 'css/site.css' %}">
     {% block extra_head %}{% endblock %}

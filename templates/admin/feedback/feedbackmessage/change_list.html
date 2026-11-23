@@ -1,12 +1,5 @@
 {% extends "admin/change_list.html" %}
 
-{% comment %}
-    Список сообщений: под поиском — панель кнопок, как в почте
-    («Прочитано», «Не прочитано», «Удалить»). Кнопки оживляет
-    static/js/admin-list-toolbar.js. Без JavaScript панель скрыта,
-    и работает обычная панель действий Django/Unfold.
-{% endcomment %}
-
 {% block filters %}
     {{ block.super }}
 

@@ -1,9 +1,4 @@
 {% load unfold %}
-{% comment %}
-    Таблица «Последние сообщения» на «Сводке».
-    Подключается в admin/index.html и отдаётся отдельно по адресу
-    …/feedbackmessage/latest/ — для автообновления без перезагрузки.
-{% endcomment %}
 {% if latest_messages.rows %}
     {% component "unfold/components/table.html" with table=latest_messages card_included=1 %}{% endcomponent %}
 {% else %}

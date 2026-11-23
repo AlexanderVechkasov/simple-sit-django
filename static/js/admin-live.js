@@ -1,26 +1,18 @@
-/*
- * «Живая» админка: раз в 20 секунд спрашиваем сервер, сколько непрочитанных
- * сообщений и не пришло ли новое. Обновляем число в меню и на «Сводке»,
- * таблицу «Последние сообщения» на «Сводке», а о новом сообщении показываем
- * уведомление — всё без перезагрузки страницы.
- *
- * Подключается на всех страницах админки через UNFOLD["SCRIPTS"].
- */
+/* Периодический опрос счётчика непрочитанных сообщений и обновление сводки админки. */
 (function () {
-    const POLL_INTERVAL = 20 * 1000; // 20 секунд
+    const POLL_INTERVAL = 20 * 1000;
 
-    // Классы значка — те же, что у Unfold (шаблон unfold/helpers/badge.html)
+    // Классы совпадают с unfold/helpers/badge.html для визуальной согласованности.
     const BADGE_CLASSES = 'sidebar-badge font-semibold h-[18px] leading-[18px] ms-2 px-1 relative '
         + 'rounded-xs text-center text-[11px] whitespace-nowrap uppercase min-w-[18px] '
         + 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400';
 
-    let menuLink = null;   // ссылка «Сообщения» в боковом меню
-    let latestId = null;   // номер самого нового сообщения, которое мы уже видели
-    let lastUnread = null; // сколько непрочитанных было при прошлой проверке
+    let menuLink = null;
+    let latestId = null;
+    let lastUnread = null;
     let toast = null;
 
-    // Обновить число непрочитанных в меню и на «Сводке».
-    // Функция доступна и другим скриптам (её вызывает admin-messages.js).
+    // Вызывается также из admin-messages.js и admin-list-toolbar.js.
     window.updateUnreadCount = function (count) {
         lastUnread = count;
         if (menuLink) {
@@ -45,7 +37,7 @@
         if (!toast) {
             toast = document.createElement('div');
             toast.className = 'live-toast';
-            toast.setAttribute('role', 'status'); // скринридер прочитает сам
+            toast.setAttribute('role', 'status');
             document.body.append(toast);
         }
         toast.innerHTML = `
@@ -55,7 +47,7 @@
             <button type="button" class="live-toast-close" aria-label="Скрыть уведомление">
                 <span class="material-symbols-outlined" aria-hidden="true">close</span>
             </button>`;
-        // Почту вставляем через textContent — это данные посетителя.
+        // Данные посетителя вставляем только через textContent во избежание XSS.
         toast.querySelector('.live-toast-text').textContent = `Новое сообщение от ${email}`;
         toast.querySelector('.live-toast-close').addEventListener('click', () => {
             toast.hidden = true;
@@ -63,8 +55,6 @@
         toast.hidden = false;
     }
 
-    // Перезагрузить только таблицу «Последние сообщения» (если мы на «Сводке»).
-    // Сервер отдаёт готовый HTML из нашего же шаблона.
     async function refreshLatestMessages() {
         const box = document.querySelector('[data-latest-messages]');
         if (!box) return;
@@ -80,8 +70,6 @@
 
             const isFirstCheck = latestId === null;
             const hasNewMessage = !isFirstCheck && data.latest_id > latestId;
-            // Число изменилось не из-за нас: пришло сообщение, или его прочитали
-            // в другой вкладке, или удалили.
             const unreadChanged = !isFirstCheck && data.unread !== lastUnread;
 
             window.updateUnreadCount(data.unread);
@@ -89,20 +77,18 @@
             if (hasNewMessage || unreadChanged) await refreshLatestMessages();
             latestId = data.latest_id;
         } catch (error) {
-            // Нет сети — не страшно, попробуем в следующий раз.
+            // Сетевые сбои игнорируем: опрос повторится на следующем интервале.
         }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
         menuLink = document.querySelector('[data-status-url]');
-        if (!menuLink) return; // страница входа или нет прав на сообщения
+        if (!menuLink) return;
 
-        check(); // сразу запоминаем, какое сообщение сейчас самое новое
+        check();
         setInterval(() => {
-            // Вкладка в фоне — не дёргаем сервер зря.
             if (document.visibilityState === 'visible') check();
         }, POLL_INTERVAL);
-        // Вернулись на вкладку — проверяем сразу.
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') check();
         });

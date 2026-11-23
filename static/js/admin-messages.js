@@ -1,31 +1,12 @@
-/*
- * Админка: просмотр сообщения во всплывающем окне.
- *
- * Работает в списке «Сообщения» и в таблице «Последние сообщения» на «Сводке».
- * Окно открывается кнопкой «Прочитать», ссылкой на сообщение
- * или кликом по строке.
- * Данные приходят с нашего адреса …/<номер>/read/, и сообщение там же
- * отмечается прочитанным. Статус в строке и число в меню меняются сразу,
- * без перезагрузки страницы.
- *
- * Клики ловим на всём документе (делегирование событий), поэтому окно
- * открывается и для строк, которые появились позже — например, когда
- * таблица на «Сводке» обновилась сама.
- */
+/* Модальный просмотр сообщений обратной связи в списке и на сводке админки. */
 document.addEventListener('DOMContentLoaded', () => {
-    // .message-open — кнопка «Прочитать» в списке, .message-link — ссылка на «Сводке»
     const OPENERS = '.message-open, .message-link';
-
-    // CSRF-токен берём из формы, которая есть на каждой странице админки
-    // (например, кнопка «Выйти»).
     const tokenInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
 
-    let dialog = null;  // окно создаём при первом открытии
+    let dialog = null;
     let fields = null;
-    let opener = null;  // кнопка или ссылка, откуда открыли окно
+    let opener = null;
 
-    // Разметка окна. Здесь нет данных посетителя — их вставляем ниже
-    // через textContent, поэтому чужой HTML выполниться не может.
     function createDialog() {
         const element = document.createElement('dialog');
         element.className = 'message-dialog';
@@ -75,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
         fields.actions.hidden = true;
     }
 
-    // Статус «Новое» → «Прочитано» прямо в строке списка.
     function markRowAsRead(trigger) {
         const row = trigger.closest('tr');
         const status = row && row.querySelector('.message-status');
@@ -98,15 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
             actions: dialog.querySelector('.message-dialog-actions'),
         };
 
-        // Закрытие: кнопки с data-close или клик по затемнённому фону. Esc — сам браузер.
         dialog.addEventListener('click', (event) => {
             if (event.target === dialog || event.target.closest('[data-close]')) {
                 dialog.close();
             }
         });
 
-        // После закрытия фокус возвращается туда, откуда окно открыли
-        // (если этой строки уже нет — например, таблица обновилась, — ничего не делаем).
         dialog.addEventListener('close', () => {
             if (opener && opener.isConnected) opener.focus();
         });
@@ -127,24 +104,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             showMessage(data);
             markRowAsRead(trigger);
-            // Число непрочитанных в меню и на «Сводке» (функция из admin-live.js)
             if (window.updateUnreadCount) window.updateUnreadCount(data.unread);
         } catch (error) {
             showError();
         }
     }
 
+    // Делегируем клики на document, чтобы обработчик работал и после автообновления таблицы сводки.
     document.addEventListener('click', (event) => {
-        // Клик по кнопке «Прочитать» или ссылке на сообщение
         const trigger = event.target.closest(OPENERS);
         if (trigger) {
-            event.preventDefault(); // ссылка не уходит на другую страницу
+            event.preventDefault();
             openMessage(trigger);
             return;
         }
 
-        // Клик по любому другому месту строки с сообщением —
-        // кроме галочки выбора, ссылок и кнопок.
         if (event.target.closest('input, a, button, label, select')) return;
         const row = event.target.closest('tr');
         const rowTrigger = row && row.querySelector(OPENERS);
