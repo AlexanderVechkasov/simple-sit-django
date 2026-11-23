@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}{% if query %}Поиск: {{ query }} — {% else %}Поиск событий — {% endif %}Историческая шкала России{% endblock %}
+{% block description %}Поиск военных конфликтов и событий Российской империи по году, названию, региону и содержанию статьи.{% endblock %}
+
+{% block content %}
+<main id="main" class="article-page">
+    <p class="article-back">
+        <a class="back-link" href="{% url 'timeline:index' %}">
+            <span aria-hidden="true">←</span> Вся шкала
+        </a>
+    </p>
+
+    <h1 class="article-title">Поиск событий</h1>
+
+    <form class="search-form" method="get" action="{% url 'timeline:search' %}" role="search">
+        <label class="visually-hidden" for="pageSearchInput">Запрос для поиска</label>
+        <div class="search-field">
+            <input id="pageSearchInput" class="search-input" type="search" name="q"
+                   value="{{ query }}" placeholder="Год, название, регион или слово из статьи…"
+                   autocomplete="off">
+            <button type="button" class="search-clear" data-search-clear aria-label="Очистить поиск"
+                    {% if not query %}hidden{% endif %}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" aria-hidden="true" focusable="false">
+                    <path d="M6 6l12 12M18 6 6 18"/>
+                </svg>
+            </button>
+        </div>
+        <button type="submit" class="read-more search-submit">Найти</button>
+    </form>
+
+    <div class="search-results" aria-live="polite">
+        {% include "timeline/search_results.html" %}
+    </div>
+</main>
+{% endblock %}

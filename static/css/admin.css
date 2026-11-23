@@ -289,7 +289,8 @@ tr:has(.message-link) {
     gap: 8px;
 }
 
-.list-toolbar[hidden] {
+.list-toolbar[hidden],
+[data-admin-search-clear][hidden] {
     display: none;
 }
 

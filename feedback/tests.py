@@ -169,6 +169,17 @@ class FeedbackViewTests(TestCase):
         response = self.client.put(self.form_url)
         self.assertEqual(response.status_code, 405)
 
+    def test_privacy_page_and_footer_links(self):
+        privacy_url = reverse("privacy")
+        response = self.client.get(privacy_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "privacy.html")
+        self.assertContains(response, "152-ФЗ")
+
+        form_page = self.client.get(self.form_url)
+        self.assertContains(form_page, privacy_url)
+        self.assertContains(form_page, "https://vk.ru/alexander_vechkasov")
+
 
 class FeedbackAdminAndDashboardTests(TestCase):
     @classmethod
@@ -324,3 +335,12 @@ class FeedbackAdminAndDashboardTests(TestCase):
 
         self.msg1.refresh_from_db()
         self.assertTrue(self.msg1.is_read)
+
+    def test_admin_changelist_search_handles_cyrillic_case(self):
+        self.client.force_login(self.superuser)
+        url = reverse("admin:feedback_feedbackmessage_changelist")
+
+        response = self.client.get(url, {"q": "ПЕРВОЕ непрочитанное"})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.msg1.email)
+        self.assertNotContains(response, self.msg2.email)
