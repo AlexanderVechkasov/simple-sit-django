@@ -181,7 +181,8 @@ class FeedbackMessageAdmin(ModelAdmin):
         return False
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
-        FeedbackMessage.objects.filter(pk=object_id, is_read=False).update(is_read=True)
+        if object_id.isdigit() and self.has_change_permission(request):
+            FeedbackMessage.objects.filter(pk=int(object_id), is_read=False).update(is_read=True)
         return super().change_view(request, object_id, form_url, extra_context)
 
     @admin.action(description="Отметить как прочитанные")

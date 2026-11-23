@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.core.cache import cache
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -158,6 +158,42 @@ class FeedbackViewTests(TestCase):
             REMOTE_ADDR="203.0.113.10",
         )
         self.assertRedirects(other_ip_response, self.thanks_url)
+        self.assertEqual(FeedbackMessage.objects.count(), RATE_LIMIT + 1)
+
+    @override_settings(TRUST_PROXY_HEADERS=False)
+    def test_rate_limit_ignores_spoofed_proxy_headers_when_untrusted(self):
+        for i in range(RATE_LIMIT):
+            response = self.client.post(
+                self.form_url,
+                data=self.valid_data,
+                headers={"X-Real-IP": f"198.51.100.{i + 1}"},
+            )
+            self.assertRedirects(response, self.thanks_url)
+
+        blocked = self.client.post(
+            self.form_url,
+            data=self.valid_data,
+            headers={"X-Real-IP": "198.51.100.99"},
+        )
+        self.assertEqual(blocked.status_code, 200)
+        self.assertEqual(FeedbackMessage.objects.count(), RATE_LIMIT)
+
+    @override_settings(TRUST_PROXY_HEADERS=True)
+    def test_rate_limit_uses_proxy_headers_when_trusted(self):
+        for _ in range(RATE_LIMIT):
+            response = self.client.post(
+                self.form_url,
+                data=self.valid_data,
+                headers={"X-Real-IP": "198.51.100.1"},
+            )
+            self.assertRedirects(response, self.thanks_url)
+
+        other_visitor = self.client.post(
+            self.form_url,
+            data=self.valid_data,
+            headers={"X-Real-IP": "198.51.100.2"},
+        )
+        self.assertRedirects(other_visitor, self.thanks_url)
         self.assertEqual(FeedbackMessage.objects.count(), RATE_LIMIT + 1)
 
     def test_thanks_page_renders(self):
@@ -335,6 +371,20 @@ class FeedbackAdminAndDashboardTests(TestCase):
 
         self.msg1.refresh_from_db()
         self.assertTrue(self.msg1.is_read)
+
+    def test_change_view_does_not_mutate_for_viewer_or_crash_on_bad_id(self):
+        self.client.force_login(self.viewer)
+        url = reverse("admin:feedback_feedbackmessage_change", args=[self.msg1.pk])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.msg1.refresh_from_db()
+        self.assertFalse(self.msg1.is_read)
+
+        self.client.force_login(self.superuser)
+        bad_url = reverse("admin:feedback_feedbackmessage_change", args=["not-an-int"])
+        bad_response = self.client.get(bad_url)
+        self.assertNotEqual(bad_response.status_code, 500)
 
     def test_admin_changelist_search_handles_cyrillic_case(self):
         self.client.force_login(self.superuser)

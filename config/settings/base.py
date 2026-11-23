@@ -16,6 +16,7 @@ DEBUG = env.bool("DEBUG", default=False)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+TRUST_PROXY_HEADERS = env.bool("TRUST_PROXY_HEADERS", default=False)
 ADMIN_URL = env("ADMIN_URL")
 
 INSTALLED_APPS = [

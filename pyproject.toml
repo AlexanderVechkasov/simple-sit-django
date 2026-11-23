@@ -1,7 +1,7 @@
 [project]
 name = "simple-sit-django"
 version = "0.1.0"
-requires-python = ">=3.14"
+requires-python = ">=3.13"
 dependencies = [
     "django>=6.1,<6.2",
     "django-cleanup>=9.0.0",
