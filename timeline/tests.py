@@ -19,6 +19,7 @@ from .legacy import parse_event, parse_meta
 from .login import random_login_image
 from .models import Event, EventImage
 from .sanitize import clean_html
+from .search import search_events
 from .slugs import make_slug, transliterate
 
 User = get_user_model()
@@ -411,3 +412,64 @@ class ImportEventsCommandTests(TestCase):
     def test_import_raises_when_data_js_missing(self):
         with tempfile.TemporaryDirectory() as empty_dir, self.assertRaises(CommandError):
             call_command("import_events", empty_dir)
+
+
+class EventSearchTests(TestCase):
+    def setUp(self):
+        self.persian = Event.objects.create(
+            slug="1722-persidskiy-pokhod",
+            start_year=1722,
+            end_year=1723,
+            title="Персидский поход Петра I",
+            region="Прикаспий",
+            outcome=Event.Outcome.VICTORY,
+            summary="Поход русской армии под руководством Пётра I к Каспию.",
+            body="<p><strong>Подробный</strong> разбор похода.</p>",
+        )
+        self.war_1812 = Event.objects.create(
+            slug="1812-otechestvennaya",
+            start_year=1812,
+            title="Отечественная война",
+            region="Российская империя",
+            outcome=Event.Outcome.VICTORY,
+            summary="Война с армией Наполеона.",
+            body="<p>Упоминается также опыт походов Петра I.</p>",
+        )
+
+    def test_search_handles_cyrillic_case_and_yo_folding(self):
+        self.assertEqual(search_events("отечественная"), [self.war_1812])
+        self.assertEqual(search_events("ПЕТРА прикаспий"), [self.persian])
+        self.assertEqual(search_events("пётра прикаспий"), [self.persian])
+
+    def test_search_ranks_title_above_body_and_ignores_html_tags(self):
+        self.assertEqual(search_events("петра"), [self.persian, self.war_1812])
+        self.assertEqual(search_events("strong"), [])
+        self.assertEqual(search_events("   "), [])
+
+    def test_search_view_full_page_and_fetch_fragment(self):
+        url = reverse("timeline:search")
+
+        full = self.client.get(url, {"q": "1812"})
+        self.assertEqual(full.status_code, 200)
+        self.assertTemplateUsed(full, "timeline/search.html")
+        self.assertContains(full, self.war_1812.title)
+        self.assertNotContains(full, self.persian.title)
+
+        fragment = self.client.get(
+            url,
+            {"q": "наполеона"},
+            headers={"X-Requested-With": "fetch"},
+        )
+        self.assertEqual(fragment.status_code, 200)
+        self.assertTemplateUsed(fragment, "timeline/search_results.html")
+        self.assertTemplateNotUsed(fragment, "timeline/search.html")
+        self.assertContains(fragment, self.war_1812.title)
+
+        empty = self.client.get(url, {"q": "несуществующийзапрос"})
+        self.assertEqual(empty.status_code, 200)
+        self.assertContains(empty, "ничего не найдено")
+
+    def test_header_contains_search_link(self):
+        response = self.client.get(reverse("timeline:index"))
+        self.assertContains(response, reverse("timeline:search"))
+

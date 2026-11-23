@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{% static 'css/site.css' %}">
     {% block extra_head %}{% endblock %}
     <script src="{% static 'js/timeline.js' %}" defer></script>
+    <script src="{% static 'js/search.js' %}" defer></script>
     <script src="{% static 'js/feedback.js' %}" defer></script>
 </head>
 <body>
@@ -21,6 +22,7 @@
     {% block content %}{% endblock %}
     {% include "includes/footer.html" %}
     {% include "includes/gallery.html" %}
+    {% include "includes/search_dialog.html" %}
     {% include "includes/feedback_dialog.html" %}
     {% block extra_js %}{% endblock %}
 </body>

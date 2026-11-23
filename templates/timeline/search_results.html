@@ -1,0 +1,29 @@
+{% if query %}
+    {% if results %}
+        <p class="search-count">Найдено: {{ results|length }}</p>
+        <ol class="search-list">
+            {% for event in results %}
+                <li class="search-item">
+                    <a class="search-card" href="{{ event.get_absolute_url }}">
+                        <span class="search-card-head">
+                            <span class="event-years">{{ event.years_display }}</span>
+                            <span class="event-title">{{ event.title }}</span>
+                            {% if event.outcome %}
+                                <span class="outcome outcome--{{ event.outcome }}">
+                                    {{ event.get_outcome_display }}
+                                </span>
+                            {% endif %}
+                        </span>
+                        {% if event.summary %}
+                            <span class="search-card-summary">{{ event.summary|truncatechars:180 }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+        </ol>
+    {% else %}
+        <p class="search-empty">По запросу «{{ query }}» ничего не найдено. Попробуйте другой год или слово.</p>
+    {% endif %}
+{% else %}
+    <p class="search-empty">Введите год, название события, регион или ключевое слово.</p>
+{% endif %}

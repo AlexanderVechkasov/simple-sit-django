@@ -1,0 +1,21 @@
+<dialog id="searchDialog" class="modal modal--search" aria-labelledby="searchDialogTitle"
+        data-url="{% url 'timeline:search' %}">
+    <div class="modal-inner">
+        <div class="modal-header">
+            <h2 class="modal-title" id="searchDialogTitle">Поиск событий</h2>
+            <button type="button" class="icon-button" data-dialog-close aria-label="Закрыть окно">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" aria-hidden="true" focusable="false">
+                    <path d="M6 6l12 12M18 6 6 18"/>
+                </svg>
+            </button>
+        </div>
+        <form class="search-form" method="get" action="{% url 'timeline:search' %}" role="search">
+            <label class="visually-hidden" for="modalSearchInput">Запрос для поиска</label>
+            <input id="modalSearchInput" class="search-input" type="search" name="q"
+                   placeholder="Год, название, регион или слово из статьи…" autocomplete="off">
+            <button type="submit" class="read-more search-submit">Найти</button>
+        </form>
+        <div class="search-results" aria-live="polite"></div>
+    </div>
+</dialog>

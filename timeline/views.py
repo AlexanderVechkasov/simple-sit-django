@@ -2,8 +2,11 @@
 
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_GET
+from django.views.decorators.vary import vary_on_headers
 
 from .models import Event
+from .search import search_events
 
 ROMAN_CENTURIES = {17: "XVII", 18: "XVIII", 19: "XIX", 20: "XX", 21: "XXI"}
 
@@ -60,3 +63,16 @@ def event_by_year(request, year):
     if event is None:
         raise Http404("В этом году событий нет.")
     return redirect(event)
+
+
+@require_GET
+@vary_on_headers("X-Requested-With")
+def search(request):
+    """Поиск событий (полная страница /search/ или HTML-фрагмент для модального окна)."""
+    query = request.GET.get("q", "").strip()
+    results = search_events(query) if query else []
+    context = {"query": query, "results": results}
+
+    if request.headers.get("X-Requested-With") == "fetch":
+        return render(request, "timeline/search_results.html", context)
+    return render(request, "timeline/search.html", context)
