@@ -60,7 +60,7 @@ uv run python -c "import secrets; print(secrets.token_urlsafe(50))"
 SECRET_KEY=<сгенерированный-ключ>
 DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
-ADMIN_URL=panel/
+ADMIN_URL=
 ```
 
 Примените миграции, создайте администратора и запустите сервер:
