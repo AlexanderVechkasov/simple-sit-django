@@ -1,5 +1,28 @@
-/* Панель массовых действий над списком записей в админке (сообщения и события). */
+/* Панель массовых действий над списком записей в админке и очистка поля поиска. */
 document.addEventListener('DOMContentLoaded', () => {
+    const searchForm = document.getElementById('changelist-search');
+    if (searchForm) {
+        const searchInput = searchForm.querySelector('#searchbar');
+        const clearButton = searchForm.querySelector('[data-admin-search-clear]');
+        if (searchInput && clearButton) {
+            const hadQuery = searchInput.value.trim().length > 0;
+            const syncClear = () => {
+                clearButton.hidden = searchInput.value.length === 0;
+            };
+            searchInput.addEventListener('input', syncClear);
+            clearButton.addEventListener('click', () => {
+                searchInput.value = '';
+                syncClear();
+                if (hadQuery) {
+                    searchForm.requestSubmit();
+                } else {
+                    searchInput.focus();
+                }
+            });
+            syncClear();
+        }
+    }
+
     const toolbar = document.querySelector('[data-list-toolbar]');
     const form = document.getElementById('changelist-form');
     if (!toolbar || !form) return;

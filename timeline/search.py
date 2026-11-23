@@ -10,11 +10,12 @@ def normalize_text(text: str) -> str:
     return text.casefold().replace("ё", "е")
 
 
-def _event_fields(event: Event, *, include_internal: bool = False) -> tuple[str, str]:
-    primary = normalize_text(
-        f"{event.years_display} {event.start_year} {event.end_year or ''} {event.title}"
-    )
+def _event_searchable_text(event: Event, *, include_internal: bool = False) -> str:
     parts = [
+        event.years_display,
+        str(event.start_year),
+        str(event.end_year or ""),
+        event.title,
         event.region,
         event.get_outcome_display(),
         event.summary,
@@ -22,30 +23,22 @@ def _event_fields(event: Event, *, include_internal: bool = False) -> tuple[str,
     ]
     if include_internal:
         parts.extend([event.key or "", event.slug])
-    return primary, normalize_text(" ".join(parts))
+    return normalize_text(" ".join(parts))
 
 
 def search_events(query: str, queryset=None, *, include_internal: bool = False) -> list[Event]:
-    """Найти события, содержащие все слова запроса (без учёта регистра и ё/е).
+    """Найти события по всем словам запроса (без учёта регистра и ё/е).
 
-    Совпадения в годах и заголовке поднимаются выше совпадений только в описании.
+    Сохраняет порядок шкалы: от более поздних лет к более ранним.
     """
     tokens = normalize_text(query).split()
     if not tokens:
         return []
 
     events = queryset if queryset is not None else Event.objects.all()
-    primary_matches = []
-    secondary_matches = []
-
+    results = []
     for event in events:
-        primary, secondary = _event_fields(event, include_internal=include_internal)
-        combined = f"{primary} {secondary}"
-        if not all(token in combined for token in tokens):
-            continue
-        if all(token in primary for token in tokens):
-            primary_matches.append(event)
-        else:
-            secondary_matches.append(event)
-
-    return primary_matches + secondary_matches
+        text = _event_searchable_text(event, include_internal=include_internal)
+        if all(token in text for token in tokens):
+            results.append(event)
+    return results

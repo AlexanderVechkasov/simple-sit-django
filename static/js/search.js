@@ -1,6 +1,32 @@
-/* Модальный поиск событий через fetch с фолбэком на /search/. */
+/* Модальный поиск событий через fetch с фолбэком на /search/ и кнопкой очистки поля. */
 document.addEventListener('DOMContentLoaded', () => {
+    function bindClearButton(form, onClear) {
+        const input = form.querySelector('input[name="q"]');
+        const clearBtn = form.querySelector('[data-search-clear]');
+        if (!input || !clearBtn) return;
+
+        const sync = () => {
+            clearBtn.hidden = input.value.length === 0;
+        };
+
+        input.addEventListener('input', sync);
+        clearBtn.addEventListener('click', () => {
+            input.value = '';
+            sync();
+            input.focus();
+            if (onClear) onClear();
+        });
+        sync();
+    }
+
     const dialog = document.getElementById('searchDialog');
+    const pageForm = document.querySelector('main .search-form');
+    if (pageForm) {
+        bindClearButton(pageForm, () => {
+            if (window.location.search) pageForm.requestSubmit();
+        });
+    }
+
     if (!dialog || typeof dialog.showModal !== 'function') return;
 
     const form = dialog.querySelector('.search-form');
@@ -36,6 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
             resultsBox.innerHTML = '<p class="form-summary">Не удалось выполнить поиск. Попробуйте ещё раз.</p>';
         }
     }
+
+    bindClearButton(form, () => {
+        clearTimeout(timer);
+        if (controller) controller.abort();
+        resultsBox.innerHTML = '';
+    });
 
     function openDialog(link) {
         opener = link;

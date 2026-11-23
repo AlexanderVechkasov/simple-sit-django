@@ -456,8 +456,8 @@ class EventSearchTests(TestCase):
         self.assertEqual(search_events("ПЕТРА прикаспий"), [self.persian])
         self.assertEqual(search_events("пётра прикаспий"), [self.persian])
 
-    def test_search_ranks_title_above_body_and_ignores_html_tags(self):
-        self.assertEqual(search_events("петра"), [self.persian, self.war_1812])
+    def test_search_orders_newest_first_and_ignores_html_tags(self):
+        self.assertEqual(search_events("петра"), [self.war_1812, self.persian])
         self.assertEqual(search_events("strong"), [])
         self.assertEqual(search_events("   "), [])
 

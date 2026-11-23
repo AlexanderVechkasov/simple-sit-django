@@ -12,8 +12,16 @@
         </div>
         <form class="search-form" method="get" action="{% url 'timeline:search' %}" role="search">
             <label class="visually-hidden" for="modalSearchInput">Запрос для поиска</label>
-            <input id="modalSearchInput" class="search-input" type="search" name="q"
-                   placeholder="Год, название, регион или слово из статьи…" autocomplete="off">
+            <div class="search-field">
+                <input id="modalSearchInput" class="search-input" type="search" name="q"
+                       placeholder="Год, название, регион или слово из статьи…" autocomplete="off">
+                <button type="button" class="search-clear" data-search-clear aria-label="Очистить поиск" hidden>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" aria-hidden="true" focusable="false">
+                        <path d="M6 6l12 12M18 6 6 18"/>
+                    </svg>
+                </button>
+            </div>
             <button type="submit" class="read-more search-submit">Найти</button>
         </form>
         <div class="search-results" aria-live="polite"></div>
