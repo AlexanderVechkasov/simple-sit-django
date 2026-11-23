@@ -1,0 +1,27 @@
+{% load static %}<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Историческая шкала России{% endblock %}</title>
+    <meta name="description" content="{% block description %}Интерактивная хронология военных конфликтов Российской империи 1722–1918 годов{% endblock %}">
+    <meta name="color-scheme" content="light dark">
+
+    {# Без defer: применяем тему до первого рендера, чтобы избежать мелькания (FOUC) #}
+    <script src="{% static 'js/theme.js' %}"></script>
+
+    <link rel="preload" href="{% static 'fonts/inter-cyrillic-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{% static 'css/site.css' %}">
+    {% block extra_head %}{% endblock %}
+    <script src="{% static 'js/timeline.js' %}" defer></script>
+    <script src="{% static 'js/feedback.js' %}" defer></script>
+</head>
+<body>
+    {% include "includes/header.html" %}
+    {% block content %}{% endblock %}
+    {% include "includes/footer.html" %}
+    {% include "includes/gallery.html" %}
+    {% include "includes/feedback_dialog.html" %}
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

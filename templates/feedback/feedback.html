@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Написать нам — Историческая шкала России{% endblock %}
+{% block description %}Сообщить об ошибке, дополнить статью или предложить новое событие для исторической шкалы.{% endblock %}
+
+{% block content %}
+<main id="main" class="article-page">
+    <h1 class="article-title">Написать нам</h1>
+    <p class="lead">Нашли ошибку, хотите что-то дополнить или предложить новое событие?
+        Напишите — ответим на почту. Оба поля обязательны.</p>
+
+    {% include "feedback/form.html" %}
+</main>
+{% endblock %}

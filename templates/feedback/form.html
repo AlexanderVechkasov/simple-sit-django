@@ -1,0 +1,29 @@
+<form class="feedback-form" method="post" action="{% url 'feedback:form' %}" novalidate>
+    {% csrf_token %}
+
+    {% if form.errors %}
+        <p class="form-summary" role="alert" tabindex="-1">
+            {% if form.non_field_errors %}
+                {{ form.non_field_errors.0 }}
+            {% else %}
+                Сообщение не отправлено — проверьте поля ниже.
+            {% endif %}
+        </p>
+    {% endif %}
+
+    {% for field in form %}
+        {% if field.name == "homepage" %}
+            <div class="hp-field" aria-hidden="true">
+                {{ field.as_field_group }}
+            </div>
+        {% else %}
+            <div class="form-field">
+                {{ field.as_field_group }}
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <div>
+        <button type="submit" class="read-more">Отправить</button>
+    </div>
+</form>

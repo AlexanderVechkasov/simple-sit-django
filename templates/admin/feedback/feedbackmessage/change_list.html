@@ -1,0 +1,23 @@
+{% extends "admin/change_list.html" %}
+
+{% block filters %}
+    {{ block.super }}
+
+    <div class="list-toolbar" role="group" aria-label="Действия с выбранными сообщениями"
+         data-list-toolbar data-bulk-url="{% url 'admin:feedback_feedbackmessage_bulk' %}" hidden>
+        {% if can_change %}
+            <button type="button" class="list-tool" data-tool="read" disabled>
+                <span class="material-symbols-outlined" aria-hidden="true">drafts</span>Прочитано
+            </button>
+            <button type="button" class="list-tool" data-tool="unread" disabled>
+                <span class="material-symbols-outlined" aria-hidden="true">mark_email_unread</span>Не прочитано
+            </button>
+        {% endif %}
+        {% if can_delete %}
+            <button type="button" class="list-tool danger" data-tool="delete" disabled>
+                <span class="material-symbols-outlined" aria-hidden="true">delete</span>Удалить
+            </button>
+        {% endif %}
+        <span class="list-toolbar-status" role="status">Отметьте записи галочками</span>
+    </div>
+{% endblock %}

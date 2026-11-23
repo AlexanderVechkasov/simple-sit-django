@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main id="main">
+    <section class="intro" aria-labelledby="page-title">
+        <h1 id="page-title">Войны и походы Российской империи</h1>
+        {% if first_year %}
+            <p class="lead">Хронология военных конфликтов {{ first_year }}–{{ last_year }} годов.
+                Нажмите на событие, чтобы прочитать краткую справку.</p>
+        {% endif %}
+    </section>
+
+    {% if centuries %}
+        <nav class="century-nav" aria-label="Переход по векам">
+            <ul>
+                {% for century in centuries %}
+                    <li><a href="#century-{{ century.number }}">{{ century.roman }} век</a></li>
+                {% endfor %}
+            </ul>
+        </nav>
+    {% endif %}
+
+    <div class="timeline">
+        {% for century in centuries %}
+            <section class="century" id="century-{{ century.number }}"
+                     aria-labelledby="century-{{ century.number }}-title">
+                <h2 class="century-title" id="century-{{ century.number }}-title">{{ century.roman }} век</h2>
+
+                <ol class="event-list">
+                    {% for event in century.events %}
+                        <li class="event" id="event-{{ event.slug }}">
+                            <h3 class="event-heading">
+                                <button type="button" class="event-toggle"
+                                        aria-expanded="false" aria-controls="description-{{ event.slug }}">
+                                    <span class="event-years">{{ event.years_display }}</span>
+                                    <span class="event-title">{{ event.title }}</span>
+                                    {% if event.outcome %}
+                                        <span class="outcome outcome--{{ event.outcome }}">
+                                            <span class="visually-hidden">Итог:</span>
+                                            {{ event.get_outcome_display }}
+                                        </span>
+                                    {% endif %}
+                                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                         aria-hidden="true" focusable="false">
+                                        <path d="m6 9 6 6 6-6"/>
+                                    </svg>
+                                </button>
+                            </h3>
+
+                            <div class="event-body" id="description-{{ event.slug }}" hidden>
+                                {% if event.images.all %}
+                                    <div class="event-images">
+                                        {% for image in event.images.all %}
+                                            <a href="{{ image.image.url }}" class="gallery-link"
+                                               data-gallery="{{ event.slug }}" data-caption="{{ image.caption }}">
+                                                <img src="{{ image.image.url }}" alt="{{ image.caption }}" loading="lazy">
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <p class="event-summary">{{ event.summary }}</p>
+                                <a href="{{ event.get_absolute_url }}" class="read-more">
+                                    Читать статью<span class="visually-hidden">: {{ event.title }}</span>
+                                    <span aria-hidden="true">→</span>
+                                </a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ol>
+            </section>
+        {% empty %}
+            <p class="empty-note">Событий пока нет. Добавьте их в админке или запустите импорт.</p>
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}

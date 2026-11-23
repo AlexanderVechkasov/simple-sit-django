@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Страница не найдена — Историческая шкала России{% endblock %}
+
+{% block content %}
+<main id="main" class="article-page error-page">
+    <p class="article-years">Ошибка 404</p>
+    <h1 class="article-title">Страница не найдена</h1>
+    <p class="lead">Возможно, в адресе опечатка или такой статьи на сайте нет.
+        Все события собраны на главной шкале.</p>
+    <p>
+        <a class="read-more" href="{% url 'timeline:index' %}">
+            На главную шкалу <span aria-hidden="true">→</span>
+        </a>
+    </p>
+</main>
+{% endblock %}

@@ -1,0 +1,463 @@
+/* Переопределения стилей админки Unfold (подключается через UNFOLD["STYLES"]). */
+
+.theme-switch .material-symbols-outlined {
+    font-size: 24px;
+}
+
+.admin-thumb {
+    width: 64px;
+    max-width: none; /* Unfold по умолчанию сжимает <img> по ширине ячейки */
+    height: 48px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+/* ===== Сообщения и модальные окна ===== */
+
+.message-open {
+    padding: 4px 12px;
+    border: 1px solid var(--color-primary-600);
+    border-radius: 6px;
+    color: var(--color-primary-600);
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.message-open:hover {
+    background-color: var(--color-primary-600);
+    color: #ffffff;
+}
+
+.dark .message-open {
+    border-color: var(--color-primary-400);
+    color: var(--color-primary-300);
+}
+
+.dark .message-open:hover {
+    background-color: var(--color-primary-500);
+    color: #ffffff;
+}
+
+.message-dialog {
+    position: fixed;
+    inset: 0;
+    translate: none;
+    width: min(100% - 2rem, 36rem);
+    max-height: calc(100vh - 2rem);
+    margin: auto;
+    padding: 0;
+    border: 1px solid var(--color-base-200);
+    border-radius: 12px;
+    background-color: #ffffff;
+    color: var(--color-base-700);
+    box-shadow: 0 20px 60px rgb(0 0 0 / 0.3);
+}
+
+.dark .message-dialog {
+    border-color: var(--color-base-700);
+    background-color: var(--color-base-900);
+    color: var(--color-base-200);
+}
+
+.message-dialog::backdrop {
+    background-color: rgb(10 11 13 / 0.6);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+.message-dialog-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+}
+
+.message-dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.message-dialog-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.message-dialog-close {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.message-dialog-close:hover {
+    background-color: var(--color-base-100);
+}
+
+.dark .message-dialog-close:hover {
+    background-color: var(--color-base-800);
+}
+
+.message-dialog-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 32px;
+    margin: 0;
+    font-size: 14px;
+}
+
+.message-dialog-meta dt {
+    color: var(--color-base-500);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.message-dialog-meta dd {
+    margin: 2px 0 0;
+}
+
+.message-dialog-text {
+    margin: 0;
+    padding: 16px;
+    border-radius: 8px;
+    background-color: var(--color-base-50);
+    font-size: 15px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.dark .message-dialog-text {
+    background-color: var(--color-base-800);
+}
+
+.message-dialog-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.message-dialog-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid var(--color-base-200);
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.dark .message-dialog-button {
+    border-color: var(--color-base-700);
+}
+
+.message-dialog-button.primary {
+    border-color: var(--color-primary-600);
+    background-color: var(--color-primary-600);
+    color: #ffffff;
+}
+
+.message-dialog-button .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.message-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background-color: var(--color-base-100);
+    color: var(--color-base-600);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.message-status.is-unread {
+    background-color: var(--color-primary-100);
+    color: var(--color-primary-700);
+}
+
+.dark .message-status {
+    background-color: var(--color-base-800);
+    color: var(--color-base-300);
+}
+
+.dark .message-status.is-unread {
+    background-color: var(--color-primary-900);
+    color: var(--color-primary-200);
+}
+
+tr:has(.message-open),
+tr:has(.message-link) {
+    cursor: pointer;
+}
+
+/* ===== Live-уведомления ===== */
+
+.live-toast {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 12px 12px 16px;
+    border: 1px solid var(--color-base-200);
+    border-radius: 10px;
+    background-color: #ffffff;
+    color: var(--color-base-700);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.2);
+    font-size: 14px;
+    animation: live-toast-in 0.25s ease;
+}
+
+.live-toast[hidden] {
+    display: none;
+}
+
+.dark .live-toast {
+    border-color: var(--color-base-700);
+    background-color: var(--color-base-800);
+    color: var(--color-base-200);
+}
+
+.live-toast > .material-symbols-outlined,
+.live-toast-link {
+    color: var(--color-primary-600);
+}
+
+.live-toast-link {
+    font-weight: 600;
+}
+
+.dark .live-toast > .material-symbols-outlined,
+.dark .live-toast-link {
+    color: var(--color-primary-300);
+}
+
+.live-toast-close {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+@keyframes live-toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .live-toast {
+        animation: none;
+    }
+}
+
+.message-link {
+    color: var(--color-primary-600);
+    font-weight: 500;
+}
+
+.message-link:hover {
+    text-decoration: underline;
+}
+
+.dark .message-link {
+    color: var(--color-primary-300);
+}
+
+/* ===== Панель массовых действий ===== */
+
+.list-toolbar {
+    display: flex;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.list-toolbar[hidden] {
+    display: none;
+}
+
+.list-tool {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid var(--color-base-200);
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: var(--color-base-700);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.list-tool .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.list-tool:hover:not(:disabled) {
+    border-color: var(--color-primary-600);
+    color: var(--color-primary-600);
+}
+
+.list-tool.danger:hover:not(:disabled) {
+    border-color: #dc2626;
+    color: #dc2626;
+}
+
+.list-tool:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.dark .list-tool {
+    border-color: var(--color-base-700);
+    background-color: var(--color-base-900);
+    color: var(--color-base-200);
+}
+
+.dark .list-tool:hover:not(:disabled) {
+    border-color: var(--color-primary-400);
+    color: var(--color-primary-300);
+}
+
+.dark .list-tool.danger:hover:not(:disabled) {
+    border-color: #f87171;
+    color: #f87171;
+}
+
+.list-toolbar-status {
+    margin-inline-start: 4px;
+    color: var(--color-base-500);
+    font-size: 14px;
+}
+
+/* Скрываем нижнюю панель действий Unfold, когда активна верхняя панель (admin-list-toolbar.js). */
+.list-toolbar-ready div:has(> #changelist-actions-wrapper) {
+    display: none !important;
+}
+
+.message-dialog-button.danger {
+    border-color: #dc2626;
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+.message-dialog-button.danger:hover {
+    border-color: #b91c1c;
+    background-color: #b91c1c;
+}
+
+/* ===== Страница входа ===== */
+
+@font-face {
+    font-family: "PT Serif";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("../fonts/pt-serif-cyrillic-700-normal.woff2") format("woff2");
+    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+    font-family: "PT Serif";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("../fonts/pt-serif-latin-700-normal.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+        U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+        U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+.login-overline {
+    margin-bottom: 8px;
+    color: var(--color-primary-600);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.login-title {
+    color: var(--color-base-900);
+    font-family: "PT Serif", Georgia, serif;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.dark .login-overline {
+    color: var(--color-primary-400);
+}
+
+.dark .login-title {
+    color: #ffffff;
+}
+
+.login #page {
+    --login-bg: #ffffff;
+}
+
+.dark .login #page {
+    --login-bg: var(--color-base-900);
+}
+
+.login #page > div[style*="background-image"] {
+    position: relative;
+    background-position: center;
+    animation: login-picture-in 1.2s ease-out both;
+}
+
+.login #page > div[style*="background-image"]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to right,
+        var(--login-bg) 0%,
+        color-mix(in srgb, var(--login-bg) 70%, transparent) 12%,
+        color-mix(in srgb, var(--login-bg) 25%, transparent) 30%,
+        transparent 50%
+    );
+}
+
+.login #page > div:first-child > div {
+    animation: login-form-in 0.6s ease-out both;
+}
+
+@keyframes login-picture-in {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes login-form-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .login #page > div[style*="background-image"],
+    .login #page > div:first-child > div {
+        animation: none;
+    }
+}

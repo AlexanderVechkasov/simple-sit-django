@@ -1,0 +1,6 @@
+{% load unfold %}
+{% if latest_messages.rows %}
+    {% component "unfold/components/table.html" with table=latest_messages card_included=1 %}{% endcomponent %}
+{% else %}
+    {% component "unfold/components/text.html" %}Сообщений пока нет.{% endcomponent %}
+{% endif %}
