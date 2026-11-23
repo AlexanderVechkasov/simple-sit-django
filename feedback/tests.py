@@ -169,6 +169,17 @@ class FeedbackViewTests(TestCase):
         response = self.client.put(self.form_url)
         self.assertEqual(response.status_code, 405)
 
+    def test_privacy_page_and_footer_links(self):
+        privacy_url = reverse("privacy")
+        response = self.client.get(privacy_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "privacy.html")
+        self.assertContains(response, "152-ФЗ")
+
+        form_page = self.client.get(self.form_url)
+        self.assertContains(form_page, privacy_url)
+        self.assertContains(form_page, "https://vk.ru/alexander_vechkasov")
+
 
 class FeedbackAdminAndDashboardTests(TestCase):
     @classmethod
