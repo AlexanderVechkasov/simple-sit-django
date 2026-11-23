@@ -13,11 +13,10 @@ class FeedbackMessage(models.Model):
     is_read = models.BooleanField("прочитано", default=False)
 
     class Meta:
-        ordering = ["-created_at"]  # новые сверху
+        ordering = ["-created_at"]
         verbose_name = "сообщение"
         verbose_name_plural = "сообщения"
 
     def __str__(self):
-        # localtime переводит время из UTC (так оно хранится в базе) в московское
         received = timezone.localtime(self.created_at)
         return f"{self.email}, {received:%d.%m.%Y %H:%M}"

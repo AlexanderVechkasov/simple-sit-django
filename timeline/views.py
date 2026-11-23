@@ -5,17 +5,13 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import Event
 
-# Римские цифры для заголовков веков.
 ROMAN_CENTURIES = {17: "XVII", 18: "XVIII", 19: "XIX", 20: "XX", 21: "XXI"}
 
 
 def timeline(request):
-    """Главная страница: все события, сгруппированные по векам."""
-    # prefetch_related загружает картинки всех событий одним запросом,
-    # а не отдельным запросом на каждое из 60 событий.
+    """Главная страница: события, сгруппированные по векам."""
     events = list(Event.objects.prefetch_related("images"))
 
-    # Раскладываем события по векам: {18: [...], 19: [...], 20: [...]}
     by_century = {}
     for event in events:
         by_century.setdefault(event.century, []).append(event)
@@ -31,7 +27,6 @@ def timeline(request):
 
     context = {
         "centuries": centuries,
-        # Границы для вступления: «1722–1918 годов»
         "first_year": min((e.start_year for e in events), default=None),
         "last_year": max((e.end_year or e.start_year for e in events), default=None),
     }
@@ -39,11 +34,9 @@ def timeline(request):
 
 
 def event_detail(request, slug):
-    """Страница-статья одного события: /events/1914-pervaya-mirovaya-voyna/."""
+    """Страница статьи одного события."""
     event = get_object_or_404(Event.objects.prefetch_related("images"), slug=slug)
 
-    # Соседние события на шкале — для ссылок «Предыдущее» и «Следующее».
-    # Берём только нужные поля: адрес, заголовок и годы.
     all_events = list(
         Event.objects.order_by("start_year", "order", "pk").only(
             "slug", "title", "start_year", "end_year"
@@ -62,12 +55,8 @@ def event_detail(request, slug):
 
 
 def event_by_year(request, year):
-    """Короткий адрес /events/1914/ ведёт на полный адрес статьи.
-    Если в этом году несколько событий (например, 1735), ведём на первое
-    по порядку шкалы. Если событий нет — страница «не найдено».
-    """
+    """Перенаправить короткий адрес /events/<year>/ на первое событие этого года."""
     event = Event.objects.filter(start_year=year).first()
     if event is None:
         raise Http404("В этом году событий нет.")
-    # redirect() сам возьмёт адрес из event.get_absolute_url().
     return redirect(event)

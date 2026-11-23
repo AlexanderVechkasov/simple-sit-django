@@ -19,7 +19,6 @@ def latest_messages_table(limit=5):
     без JavaScript ссылка просто ведёт на страницу сообщения.
     """
     rows = []
-    # Порядок «сначала свежие» задан в модели (ordering = ["-created_at"]).
     for message in FeedbackMessage.objects.all()[:limit]:
         change_url = reverse("admin:feedback_feedbackmessage_change", args=[message.pk])
         read_url = reverse("admin:feedback_feedbackmessage_read", args=[message.pk])

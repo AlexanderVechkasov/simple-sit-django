@@ -9,7 +9,7 @@ class FeedbackForm(forms.ModelForm):
     """Почта и текст сообщения. Проверки длины и формата почты Django
     берёт из модели, а свои тексты ошибок задаём ниже — по-человечески."""
 
-    # Ловушка для ботов (honeypot).
+    # Honeypot: скрытое поле-ловушка для спам-ботов.
     homepage = forms.CharField(
         label="Не заполняйте это поле",
         required=False,
@@ -42,7 +42,6 @@ class FeedbackForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        # Без двоеточия после подписей: «Ваша почта», а не «Ваша почта:»
         kwargs.setdefault("label_suffix", "")
         super().__init__(*args, **kwargs)
 

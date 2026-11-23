@@ -6,16 +6,13 @@ from pathlib import Path
 from django.core.files.base import ContentFile
 from PIL import Image, ImageOps
 
-# Больше этого по длинной стороне сайту не нужно: в статье картинка ~720 px,
-# в увеличенном просмотре галереи — не больше экрана.
 MAX_SIDE = 1920
-# Картинки не больше MAX_SIDE и легче этого оставляем как есть — без пересжатия.
-MAX_BYTES = 1024 * 1024  # 1 МБ
-JPEG_QUALITY = 85  # 85 из 100: на глаз как оригинал, а файл в разы меньше
+MAX_BYTES = 1024 * 1024
+JPEG_QUALITY = 85
 
 
 def to_rgb(img):
-    """JPEG не умеет прозрачность: прозрачные места заливаем белым."""
+    """Конвертировать изображение в RGB, заливая прозрачность белым для JPEG."""
     if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
         img = img.convert("RGBA")
         background = Image.new("RGB", img.size, "white")
@@ -25,10 +22,9 @@ def to_rgb(img):
 
 
 def shrink_image(image_file):
-    """Вернуть уменьшенную копию картинки в JPEG.
+    """Уменьшить и пересохранить изображение в JPEG, если оно превышает лимиты.
 
-    Если картинка и так небольшая и лёгкая, возвращает None —
-    тогда сохраняем оригинал без изменений.
+    Возвращает None, если файл уже вписывается в MAX_SIDE и MAX_BYTES.
     """
     image_file.seek(0)
     with Image.open(image_file) as img:
@@ -36,15 +32,13 @@ def shrink_image(image_file):
             image_file.seek(0)
             return None
 
-        # Фото с телефона бывают «лёжа» с пометкой о повороте — поворачиваем как надо.
+        # Учитываем ориентацию из EXIF, чтобы фото с телефонов не сохранялись повёрнутыми.
         img = ImageOps.exif_transpose(img)
-        # thumbnail только уменьшает и сохраняет пропорции.
         img.thumbnail((MAX_SIDE, MAX_SIDE), Image.Resampling.LANCZOS)
         img = to_rgb(img)
 
         buffer = BytesIO()
         img.save(buffer, "JPEG", quality=JPEG_QUALITY, optimize=True, progressive=True)
 
-    # Имя то же, но с расширением .jpg: «Снимок экрана.png» → «Снимок экрана.jpg».
     name = Path(image_file.name).with_suffix(".jpg").name
     return ContentFile(buffer.getvalue(), name=name)

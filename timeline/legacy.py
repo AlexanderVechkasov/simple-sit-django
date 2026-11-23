@@ -9,20 +9,13 @@
 import re
 from pathlib import Path
 
-# Одно событие: '1735a': { ... },  — ключ и всё до закрывающей скобки.
 EVENT_RE = re.compile(r"'(?P<key>[^']+)':\s*\{(?P<body>.*?)\n\s*\},", re.DOTALL)
-# Поле-строка в одинарных кавычках: title: '...'
 STRING_FIELD_RE = re.compile(r"(?P<name>\w+):\s*'(?P<value>[^']*)'")
-# Поле-строка в обратных кавычках (многострочный текст): fullContent: `...`
 TEMPLATE_FIELD_RE = re.compile(r"(?P<name>\w+):\s*`(?P<value>.*?)`", re.DOTALL)
-# Список картинок: images: ['a.jpg', 'b.jpg']
 IMAGES_RE = re.compile(r"images:\s*\[(?P<items>[^\]]*)\]")
-# Годы: «1722», «1722—1723» (тире любое: — – -)
 YEARS_RE = re.compile(r"(?P<start>\d{4})(?:\s*[—–-]\s*(?P<end>\d{4}))?")
-# Тег <img ...> и его атрибуты
 IMG_TAG_RE = re.compile(r"<img\b[^>]*>", re.IGNORECASE)
 ATTR_RE = re.compile(r'(?P<name>[\w-]+)="(?P<value>[^"]*)"')
-# Начало краткой справки: <strong>Название (годы):</strong>
 SUMMARY_PREFIX_RE = re.compile(r"^\s*<strong>.*?</strong>\s*", re.DOTALL)
 
 OUTCOMES = {
@@ -59,8 +52,7 @@ def parse_event(key: str, body: str) -> dict:
     region, outcome = parse_meta(fields.get("articleMeta", ""))
     full_content = fields.get("fullContent", "")
 
-    # Подписи берём из alt у <img> в тексте статьи, а сами теги из текста убираем:
-    # картинки теперь хранятся отдельно, в EventImage.
+    # Выносим <img> из HTML-текста: в Django изображения хранятся отдельно в EventImage.
     captions = {}
     for tag in IMG_TAG_RE.findall(full_content):
         attrs = {m["name"]: m["value"] for m in ATTR_RE.finditer(tag)}
@@ -68,7 +60,6 @@ def parse_event(key: str, body: str) -> dict:
             captions[attrs["src"]] = attrs.get("alt") or attrs.get("title", "")
     body_html = IMG_TAG_RE.sub("", full_content)
 
-    # Все пути к картинкам по порядку, без повторов.
     paths = []
     images_match = IMAGES_RE.search(body)
     if images_match:

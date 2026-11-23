@@ -16,7 +16,6 @@ def dashboard_callback(request, context):
     events_url = reverse("admin:timeline_event_changelist")
     messages_url = reverse("admin:feedback_feedbackmessage_changelist")
 
-    # Сколько событий в каждом веке: {18: 26, 19: 30, 20: 4}
     by_century = {}
     for year in Event.objects.values_list("start_year", flat=True):
         century = (year - 1) // 100 + 1
@@ -51,6 +50,5 @@ def dashboard_callback(request, context):
         },
     ]
 
-    # Таблица «Последние сообщения» (её же отдаёт автообновление «Сводки»)
     context["latest_messages"] = latest_messages_table()
     return context

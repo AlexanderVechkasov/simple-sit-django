@@ -45,7 +45,7 @@ def transliterate(text: str) -> str:
     for char in text:
         latin = TRANSLIT.get(char.lower())
         if latin is None:
-            result.append(char)  # не кириллица — оставляем как есть
+            result.append(char)
         elif char.isupper():
             result.append(latin.capitalize())
         else:

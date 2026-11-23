@@ -1,7 +1,4 @@
-"""
-Общие настройки проекта — одинаковые для разработки и для сервера.
-Секреты и всё, что отличается между компьютерами, читаем из файла .env.
-"""
+"""Базовые настройки проекта, общие для dev и prod окружений."""
 
 from pathlib import Path
 
@@ -9,24 +6,16 @@ import environ
 from django.templatetags.static import static
 from django.urls import reverse_lazy
 
-# Корень проекта — папка, где лежит manage.py.
-# Этот файл лежит в config/settings/base.py, поэтому поднимаемся на три уровня.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Читаем .env, если он есть. На сервере переменные можно задать и без файла.
 env = environ.Env()
 environ.Env.read_env(BASE_DIR / ".env")
 
-# Секретный ключ — только из окружения. Если его нет, Django не запустится.
 SECRET_KEY = env("SECRET_KEY")
-
-# Отладка выключена по умолчанию, включается только явно в .env.
 DEBUG = env.bool("DEBUG", default=False)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
-
-# Адрес админки (не стандартный /admin/). Обязателен в .env.
 ADMIN_URL = env("ADMIN_URL")
 
 INSTALLED_APPS = [
@@ -36,12 +25,12 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    # Чтобы runserver отдавал статику так же, как сервер (через WhiteNoise).
+    # Перед staticfiles, чтобы runserver отдавал статику через WhiteNoise.
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "timeline",
     "feedback",
-    # Удаляет файлы картинок с диска вместе с записью и при замене картинки.
+    # Должен идти последним, чтобы корректно перехватывать сигналы удаления файлов.
     "django_cleanup.apps.CleanupConfig",
 ]
 
@@ -61,7 +50,6 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        # Общая папка шаблонов в корне проекта (создадим на этапе 4).
         "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -76,8 +64,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# База для разработки — SQLite, один файл в корне проекта.
-# На сервере её заменяет prod.py через DATABASE_URL.
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -92,38 +78,29 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# Язык и время: русский интерфейс (в том числе админки), московское время.
 LANGUAGE_CODE = "ru"
 TIME_ZONE = "Europe/Moscow"
 USE_I18N = True
 USE_TZ = True
-# Свои переводы проекта (например, надписи Unfold) — в папке locale/
 LOCALE_PATHS = [BASE_DIR / "locale"]
 
-# Статика (CSS, JS, иконки).
 STATIC_URL = "static/"
-# Где лежат наши исходные файлы статики.
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# Загруженные файлы — картинки событий.
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Оформление админки (Unfold): название, цвета и боковое меню.
 UNFOLD = {
     "SITE_TITLE": "Историческая шкала",
     "SITE_HEADER": "Историческая шкала",
     "SITE_SUBHEADER": "Панель управления",
-    "SITE_SYMBOL": "history_edu",  # значок из набора Material Symbols
-    # Страница входа: справа случайная картина из событий шкалы
+    "SITE_SYMBOL": "history_edu",
     "LOGIN": {"image": "timeline.login.random_login_image"},
     "SITE_URL": "/",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
-    # Данные для «Сводки» на главной странице админки
     "DASHBOARD_CALLBACK": "timeline.dashboard.dashboard_callback",
-    # Наш CSS поверх оформления Unfold
     "STYLES": [lambda request: static("css/admin.css")],
     "SCRIPTS": [
         lambda request: static("js/admin-live.js"),
@@ -131,8 +108,6 @@ UNFOLD = {
         lambda request: static("js/admin-theme-sync.js"),
         lambda request: static("js/admin-delete-confirm.js"),
     ],
-    # Основной цвет — тёмно-синий, как на сайте. Оттенки от светлого (50)
-    # до тёмного (950) в формате oklch; Unfold сам выбирает нужные.
     "COLORS": {
         "primary": {
             "50": "oklch(97% 0.014 254.604)",
@@ -148,7 +123,6 @@ UNFOLD = {
             "950": "oklch(19% 0.06 268)",
         },
     },
-    # Боковое меню: свои разделы, названия и значки.
     "SIDEBAR": {
         "show_search": True,
         "show_all_applications": False,
@@ -170,9 +144,8 @@ UNFOLD = {
                         "title": "Сообщения",
                         "icon": "mail",
                         "link": reverse_lazy("admin:feedback_feedbackmessage_changelist"),
-                        # Число непрочитанных — функция в feedback/admin.py
                         "badge": "feedback.admin.unread_badge",
-                        # Адрес, который admin-live.js опрашивает раз в 20 секунд
+                        # Эндпоинт периодического опроса из static/js/admin-live.js.
                         "link_attrs": {
                             "data-status-url": reverse_lazy(
                                 "admin:feedback_feedbackmessage_status"
@@ -183,7 +156,7 @@ UNFOLD = {
             },
             {
                 "title": "Доступ",
-                "collapsible": True,  # раздел можно свернуть
+                "collapsible": True,
                 "items": [
                     {
                         "title": "Пользователи",

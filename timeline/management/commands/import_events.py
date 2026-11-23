@@ -46,8 +46,6 @@ class Command(BaseCommand):
         created = updated = images_added = 0
         missing_images = []
 
-        # Всё в одной транзакции: если на каком-то событии ошибка,
-        # в базе не останется «половины» импорта.
         with transaction.atomic():
             for position, item in enumerate(items, start=1):
                 event, is_new = self.save_event(item, order=position * 10)
@@ -85,16 +83,14 @@ class Command(BaseCommand):
         event.summary = item["summary"]
         event.region = item["region"]
         event.outcome = item["outcome"]
-        # Убираем лишние пустые строки и отступы, оставшиеся от вёрстки data.js.
         event.body = re.sub(r"\s*\n\s*", "\n", item["body"])
         event.order = order
 
-        # Та же проверка полей, что и в админке: длина, формат адреса, годы.
         try:
             event.full_clean()
         except ValidationError as error:
             raise CommandError(f"Событие {item['key']}: {error}") from error
-        event.save()  # здесь же сработает очистка HTML (метод save в модели)
+        event.save()
         return event, is_new
 
     def unique_slug(self, item):
@@ -107,14 +103,13 @@ class Command(BaseCommand):
     def save_image(self, event, image, number, source):
         """Скопировать картинку в media/events/ и привязать к событию."""
         if event.images.filter(order=number).exists():
-            return "exists"  # уже импортирована раньше — не дублируем
+            return "exists"
 
         path = (source / image["path"]).resolve()
-        # Защита: путь из data.js не должен «выходить» из папки старого сайта.
+        # Защита от path traversal: не читаем файлы за пределами каталога source.
         if not path.is_relative_to(source) or not path.is_file():
             return "missing"
 
-        # Простое имя файла вместо placeholder_1733—1735_1.jpg: 1733-1.jpg
         new_name = f"{event.key}-{number}{path.suffix.lower()}"
         with path.open("rb") as file:
             EventImage.objects.create(

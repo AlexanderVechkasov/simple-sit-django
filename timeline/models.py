@@ -12,7 +12,6 @@ class Event(models.Model):
     """Историческое событие на шкале."""
 
     class Outcome(models.TextChoices):
-        # Слева — что хранится в базе, справа — что видит человек.
         VICTORY = "victory", "Победа"
         DEFEAT = "defeat", "Поражение"
         DRAW = "draw", "Ничья"
@@ -22,7 +21,6 @@ class Event(models.Model):
         "ключ из старого сайта",
         max_length=10,
         unique=True,
-        # Ключ есть только у событий, перенесённых со старого сайта.
         blank=True,
         null=True,
         help_text=(
@@ -71,7 +69,6 @@ class Event(models.Model):
         verbose_name = "событие"
         verbose_name_plural = "события"
         constraints = [
-            # Защита на уровне базы: год окончания не раньше года начала.
             models.CheckConstraint(
                 condition=models.Q(end_year__isnull=True)
                 | models.Q(end_year__gte=models.F("start_year")),
@@ -83,9 +80,7 @@ class Event(models.Model):
         return f"{self.years_display} — {self.title}"
 
     def save(self, *args, **kwargs):
-        # Очищаем текст при КАЖДОМ сохранении: из админки, импорта или кода.
         self.body = clean_html(self.body)
-        # Краткая справка — обычный текст, поэтому теги убираем полностью.
         self.summary = strip_tags(self.summary).strip()
         super().save(*args, **kwargs)
 
@@ -141,8 +136,7 @@ class EventImage(models.Model):
         return self.caption
 
     def save(self, *args, **kwargs):
-        # Новая картинка (ещё не записана на диск): если она слишком большая
-        # или тяжёлая — уменьшаем и сохраняем в JPEG. Иначе оставляем как есть.
+        # _committed=False означает, что загружен новый файл, ещё не записанный в хранилище.
         if self.image and not self.image._committed:
             smaller = shrink_image(self.image)
             if smaller:
