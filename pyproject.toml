@@ -3,7 +3,7 @@ name = "simple-sit-django"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
-    "django>=6.1,<6.2",
+    "django>=6.1.3,<6.2",
     "django-cleanup>=9.0.0",
     "django-environ>=0.14.0",
     "django-unfold>=0.110.1",
